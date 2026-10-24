@@ -27,7 +27,9 @@ const socketRoom = new Map();
 const lastGestureAt = new Map();
 const lastAimAt = new Map();
 const lastAttackAt = new Map();
+const lastTypeAttackAt = new Map();
 const DAMAGE = { fireball: 18, chidori: 25, rasenshuriken: 22, hollowPurple: 35, narutoRush: 20 };
+const COOLDOWNS = { fireball: 5000, rasenshuriken: 6500, chidori: 7500, hollowPurple: 10000, narutoRush: 6000 };
 const MAX_HEALTH = 1000;
 
 app.get('/', (_req, res) => {
@@ -156,8 +158,13 @@ io.on('connection', socket => {
     const type = String(payload.type || '');
     if (!(type in DAMAGE)) return;
     const now = Date.now();
-    if (now - (lastAttackAt.get(socket.id) || 0) < 550) return;
+    const cd = COOLDOWNS[type] || 5000;
+    const atkKey = `${socket.id}_${type}`;
+    const lastUsed = lastTypeAttackAt.get(atkKey) || 0;
+    if (now - lastUsed < (cd - 350)) return;
+    if (now - (lastAttackAt.get(socket.id) || 0) < 450) return;
     lastAttackAt.set(socket.id, now);
+    lastTypeAttackAt.set(atkKey, now);
     const x = Number.isFinite(payload.x) ? Math.max(0, Math.min(1, payload.x)) : 0.5;
     const y = Number.isFinite(payload.y) ? Math.max(0, Math.min(1, payload.y)) : 0.5;
     // Always show the attack effect to the opponent, but only apply damage on a head hit.
@@ -179,7 +186,12 @@ io.on('connection', socket => {
     const code = socketRoom.get(socket.id), room = rooms.get(code);
     if (!room || room.players.size !== 2) return;
     room.over = false;
-    for (const id of room.players) room.health.set(id, MAX_HEALTH);
+    for (const id of room.players) {
+      room.health.set(id, MAX_HEALTH);
+      for (const k of lastTypeAttackAt.keys()) {
+        if (k.startsWith(id + '_')) lastTypeAttackAt.delete(k);
+      }
+    }
     io.to(code).emit('rematch-started');
     snapshot(code);
   });
@@ -188,6 +200,9 @@ io.on('connection', socket => {
     lastGestureAt.delete(socket.id);
     lastAimAt.delete(socket.id);
     lastAttackAt.delete(socket.id);
+    for (const k of lastTypeAttackAt.keys()) {
+      if (k.startsWith(socket.id + '_')) lastTypeAttackAt.delete(k);
+    }
   });
 });
 

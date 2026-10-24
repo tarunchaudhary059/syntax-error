@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shojumaru&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:dark;--cyan:#70f5ff;--red:#ff4757;--gold:#ffc857}*{box-sizing:border-box}body{margin:0;background:#05070b;color:#fff;font-family:Arial,sans-serif;overflow:hidden}button,input{font:inherit}button{cursor:pointer;border:1px solid #7cecf4;background:#101a25;color:#eaffff;padding:10px 14px;border-radius:8px;font-weight:700}button:hover{background:#183345}button:disabled{opacity:.5;cursor:default}.back{position:fixed;z-index:50;top:14px;right:14px;text-decoration:none;color:#fff;border:1px solid #ffffff66;background:#05070bcc;padding:9px 13px;border-radius:8px}.setup{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 30%,#173043,#05070b 65%);padding:20px}.panel{width:min(620px,100%);padding:28px;border:1px solid #70f5ff66;border-radius:18px;background:#071018eF;box-shadow:0 0 60px #00c8ff1c}.panel h1{font-family:'Shojumaru',Arial,sans-serif;font-size:clamp(30px,6vw,52px);letter-spacing:3px;margin:0 0 6px;text-transform:uppercase;color:#d8faff;text-shadow:0 0 20px rgba(112,245,255,0.4)}.sub{color:#9bc6d1;margin:0 0 22px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.joinrow{display:flex;gap:8px;margin:12px 0}.joinrow input{flex:1;min-width:0;background:#0b1118;border:1px solid #45606b;color:white;border-radius:8px;padding:10px;text-transform:uppercase}.notice{min-height:24px;color:#ffd477;font-size:14px}.rules{font-size:13px;line-height:1.6;color:#bfd1d9}.arena{position:fixed;inset:0;display:none;background:#000}.arena.show{display:block}#remoteVideo{position:absolute;width:100%;height:100%;inset:0;object-fit:cover;background:radial-gradient(circle,#1a2835,#020305);z-index:1;transform:scaleX(-1)}#remotePlaceholder{position:absolute;z-index:2;inset:0;display:grid;place-items:center;color:#9db7c4;text-align:center;background:linear-gradient(135deg,#111c26,#030507);pointer-events:none}#remotePlaceholder strong{display:block;font-size:clamp(22px,4vw,44px);letter-spacing:4px;color:#d8faff}#remotePlaceholder span{font-size:14px}.vignette{position:absolute;z-index:3;inset:0;pointer-events:none;background:linear-gradient(180deg,#000b 0%,transparent 25%,transparent 65%,#0009 100%),radial-gradient(ellipse,transparent 45%,#0008 100%)}#localVideo{position:absolute;z-index:7;right:18px;bottom:18px;width:min(22vw,260px);min-width:130px;aspect-ratio:4/3;object-fit:cover;transform:scaleX(-1);border:2px solid var(--cyan);border-radius:12px;background:#111;box-shadow:0 0 24px #00d9ff44}#crosshair{position:absolute;z-index:10;left:50%;top:50%;width:26px;height:26px;transform:translate(-50%,-50%);pointer-events:none;display:none;border:2px solid #ff3b56;border-radius:50%;box-shadow:0 0 12px #ff1744, inset 0 0 8px #ff174466;transition:transform .12s,box-shadow .12s,border-color .12s}#crosshair:before,#crosshair:after{content:"";position:absolute;background:#ff4059;left:50%;top:50%;transform:translate(-50%,-50%)}#crosshair:before{width:46px;height:2px}#crosshair:after{width:2px;height:46px}#crosshair.glow{border-color:#ffe600;box-shadow:0 0 18px #ffea00,0 0 35px #ff1744,0 0 55px #ff0055,inset 0 0 12px #ffea00;animation:pointerGlowPulse .45s infinite alternate ease-in-out}#crosshair.glow:before,#crosshair.glow:after{background:#ffe600;box-shadow:0 0 12px #ffea00,0 0 20px #ff1744}@keyframes pointerGlowPulse{0%{transform:translate(-50%,-50%) scale(1.05);filter:drop-shadow(0 0 8px #ffea00) brightness(1.2)}100%{transform:translate(-50%,-50%) scale(1.35);filter:drop-shadow(0 0 18px #ff1744) brightness(1.7)}}#opponentCrosshair{position:absolute;z-index:9;left:50%;top:50%;width:26px;height:26px;transform:translate(-50%,-50%);pointer-events:none;display:none;border:2px solid #70f5ff;border-radius:50%;box-shadow:0 0 12px #00d9ff,inset 0 0 8px #00d9ff66;transition:transform .12s,box-shadow .12s,border-color .12s}#opponentCrosshair:before,#opponentCrosshair:after{content:'';position:absolute;background:#70f5ff;left:50%;top:50%;transform:translate(-50%,-50%)}#opponentCrosshair:before{width:46px;height:2px}#opponentCrosshair:after{width:2px;height:46px}#opponentCrosshair.glow{border-color:#00ffff;box-shadow:0 0 20px #00ffff,0 0 38px #00a8ff,0 0 60px #70f5ff,inset 0 0 12px #00ffff;animation:opponentPointerGlowPulse .45s infinite alternate ease-in-out}#opponentCrosshair.glow:before,#opponentCrosshair.glow:after{background:#00ffff;box-shadow:0 0 12px #00ffff,0 0 22px #00d9ff}@keyframes opponentPointerGlowPulse{0%{transform:translate(-50%,-50%) scale(1.05);filter:drop-shadow(0 0 8px #00ffff) brightness(1.2)}100%{transform:translate(-50%,-50%) scale(1.35);filter:drop-shadow(0 0 18px #0088ff) brightness(1.7)}}#headTarget{position:absolute;z-index:4;display:none;border:1.5px dotted #ff3b56;border-radius:4px;background:rgba(255,59,86,0.08);box-shadow:0 0 12px rgba(255,59,86,0.45),inset 0 0 8px rgba(255,59,86,0.18);pointer-events:none;will-change:left,top,width,height}#headTarget:after{content:'RIVAL HEAD';position:absolute;left:50%;top:-22px;transform:translateX(-50%);font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px;font-weight:800;letter-spacing:1.5px;color:#ff6b81;text-shadow:0 1px 5px #000,0 0 8px rgba(255,59,86,0.7);white-space:nowrap}#headTarget.assist{border-color:#ff3b56;box-shadow:0 0 10px rgba(255,59,86,0.35)}#headTarget.assist:after{content:'AIM AT HEAD';color:#ff8a9e}#localHeadTarget{position:absolute;z-index:8;display:none;border:1.5px dotted #ff3b56;border-radius:4px;background:rgba(255,59,86,0.08);box-shadow:0 0 10px rgba(255,59,86,0.45),inset 0 0 6px rgba(255,59,86,0.15);pointer-events:none;will-change:left,top,width,height}#localHeadTarget:after{content:'YOU';position:absolute;left:50%;top:-18px;transform:translateX(-50%);font-family:'Barlow Condensed',Arial,sans-serif;font-size:10px;font-weight:800;letter-spacing:1.2px;color:#ff6b81;text-shadow:0 1px 4px #000,0 0 6px rgba(255,59,86,0.8);white-space:nowrap}.hud{position:absolute;z-index:8;left:18px;top:16px;width:min(430px,calc(100vw - 36px));pointer-events:none}.healthrow{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;margin-bottom:10px;text-shadow:0 2px 4px #000}.healthrow .name{font-family:'Barlow Condensed',Arial,sans-serif;font-size:14px;letter-spacing:2px;font-weight:800}.bar{height:13px;background:#171c25;border:1px solid #ffffff80;box-shadow:0 2px 8px #000;overflow:hidden;border-radius:3px;margin-top:4px}.fill{height:100%;width:100%;background:linear-gradient(90deg,#19db91,#a8ffbd);transition:width .18s}.fill.enemy{background:linear-gradient(90deg,#ed2c45,#ff9d66)}.healthnum{font-family:'Barlow Condensed',Arial,sans-serif;font-weight:800;font-size:16px}.log{position:absolute;z-index:9;left:18px;bottom:18px;width:min(360px,calc(100vw - 36px));background:#02060bd9;border:1px solid #ffffff33;border-radius:10px;padding:10px 13px;max-height:24vh;overflow:hidden;font-size:12px;line-height:1.55;color:#d9f8ff}.log strong{color:var(--gold)}.moves{position:absolute;z-index:30;right:14px;top:62px;width:min(260px,calc(100vw - 28px));background:#02060bd9;border:1px solid #ffffff40;border-radius:10px;padding:11px 13px;font-size:12px;line-height:1.6}.moves h3{margin:0 0 5px;color:var(--cyan);font-size:14px;letter-spacing:2px;font-family:'Barlow Condensed',Arial,sans-serif}.move{display:flex;justify-content:space-between;gap:8px;border-top:1px solid #ffffff18;padding:4px 0}.move b{color:#fff}.move span{color:#ffd477;text-align:right}.sign-box{margin-top:10px;padding:9px 11px;background:linear-gradient(135deg,rgba(0,240,255,0.18) 0%,rgba(3,20,32,0.92) 100%);border:1.5px solid #00f0ff;border-radius:9px;box-shadow:0 0 18px rgba(0,240,255,0.4),inset 0 0 10px rgba(0,240,255,0.18)}.sign-box-title{display:flex;align-items:center;gap:6px;font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px;font-weight:800;letter-spacing:1.8px;color:#70f5ff;text-transform:uppercase;margin-bottom:4px;text-shadow:0 0 8px rgba(112,245,255,0.75)}.sign-box-title:before{content:'';display:inline-block;width:7px;height:7px;background:#00f0ff;border-radius:50%;box-shadow:0 0 8px #00f0ff;animation:signPulse 1.8s infinite ease-in-out}@keyframes signPulse{0%,100%{opacity:.5;transform:scale(.9)}50%{opacity:1;transform:scale(1.2)}}#gestureStatus{font-family:'Barlow Condensed',Arial,sans-serif;font-size:17px;font-weight:700;line-height:1.35;letter-spacing:.6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.85),0 1px 3px #000;word-break:break-word}.sound-toggle-btn{margin-top:10px;width:100%;padding:7px 10px;font-family:'Barlow Condensed',Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:7px;border:1.5px solid #00f0ff;background:rgba(3,20,32,0.9);color:#70f5ff;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;pointer-events:auto;box-shadow:0 0 10px rgba(0,240,255,0.25);transition:all 0.2s ease}.sound-toggle-btn:hover{background:rgba(10,40,60,0.95);border-color:#70f5ff;box-shadow:0 0 16px rgba(0,240,255,0.5);color:#fff}.sound-toggle-btn.sound-off{border-color:#ff5252;color:#ff8a80;box-shadow:0 0 10px rgba(255,82,82,0.25)}.sound-toggle-btn.sound-off:hover{background:rgba(45,10,15,0.95);border-color:#ff5252;box-shadow:0 0 16px rgba(255,82,82,0.5);color:#fff}.local-sign-badge{position:absolute;z-index:8;right:18px;bottom:calc(min(22vw, 260px) * 0.75 + 26px);width:min(22vw, 260px);min-width:130px;display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(4,18,28,0.92);border:1.5px solid #00f0ff;border-radius:8px;box-shadow:0 0 14px rgba(0,240,255,0.4),inset 0 0 8px rgba(0,240,255,0.15);font-family:'Barlow Condensed',Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.75),0 1px 2px #000;pointer-events:none}.local-sign-badge .label{font-size:11px;font-weight:800;letter-spacing:1.5px;color:#8beaff;opacity:.9}.local-sign-badge .sign-val{font-size:16px;font-weight:800;color:#00f0ff}.fx{position:absolute;z-index:6;left:50%;top:50%;width:min(42vw,540px);height:auto;transform:translate(-50%,-50%);pointer-events:none;mix-blend-mode:screen;object-fit:contain}.statuspill{position:absolute;z-index:12;left:50%;top:18px;transform:translateX(-50%);padding:8px 13px;background:#000b;border:1px solid #ffffff35;border-radius:999px;font-size:12px;white-space:nowrap;max-width:45vw;overflow:hidden;text-overflow:ellipsis}.centerMessage{position:absolute;z-index:20;inset:0;display:none;place-items:center;background:#000b;text-align:center;padding:20px}.centerMessage.show{display:grid}.centerMessage h2{font-family:'Shojumaru',Arial,sans-serif;font-size:clamp(32px,7vw,68px);letter-spacing:3px;margin:0 0 10px}.centerMessage p{color:#c5e3ed}.centerMessage button{pointer-events:auto}.small{font-size:12px;color:#9bb7c3}.damage-popup{position:absolute;z-index:25;pointer-events:none;font-family:'Barlow Condensed','Shojumaru',Arial,sans-serif;font-weight:800;font-size:clamp(44px,7vw,76px);letter-spacing:2px;line-height:1;user-select:none;will-change:transform,opacity;animation:damageFloat 1.25s cubic-bezier(0.15,0.85,0.35,1.2) forwards}.damage-popup.red{color:#ff3b56;text-shadow:0 0 10px #ff1744,0 0 25px rgba(255,23,68,0.9),0 0 50px rgba(255,59,86,0.7),0 3px 6px #000,0 5px 12px rgba(0,0,0,0.95);filter:drop-shadow(0 0 10px rgba(255,23,68,0.85))}.damage-popup.cyan{color:#70f5ff;text-shadow:0 0 10px #00d9ff,0 0 25px rgba(0,217,255,0.9),0 0 50px rgba(112,245,255,0.7),0 3px 6px #000,0 5px 12px rgba(0,0,0,0.95);filter:drop-shadow(0 0 10px rgba(0,217,255,0.85))}@keyframes damageFloat{0%{opacity:0;transform:translate(-50%,-20%) scale(0.35)}15%{opacity:1;transform:translate(-50%,-60%) scale(1.35)}30%{transform:translate(-50%,-85%) scale(1)}75%{opacity:1;transform:translate(-50%,-125%) scale(0.95)}100%{opacity:0;transform:translate(-50%,-165%) scale(0.8)}}@keyframes hitShake{0%,100%{transform:translate(0,0)}20%{transform:translate(-6px,4px)}40%{transform:translate(6px,-4px)}60%{transform:translate(-4px,-3px)}80%{transform:translate(3px,3px)}}.arena.hit-shake{animation:hitShake 0.35s ease-out}@media(max-width:700px){.back{top:8px;right:8px;padding:6px 10px;font-size:11px}.moves{width:180px;right:8px;top:44px;font-size:10px;padding:7px}.hud{left:8px;top:8px;width:calc(100vw - 200px)}.healthrow .name{font-size:10px}.bar{height:10px}#localVideo{right:8px;bottom:8px;width:145px}.local-sign-badge{right:8px;bottom:calc(145px * 0.75 + 14px);width:145px;padding:4px 6px;font-size:11px}.local-sign-badge .sign-val{font-size:13px}#gestureStatus{font-size:14px}.sign-box{padding:6px 8px;margin-top:6px}.sign-box-title{font-size:10px}.log{left:8px;bottom:8px;width:calc(100vw - 175px);font-size:10px}.statuspill{top:12px;font-size:10px}.sound-toggle-btn{padding:5px 8px;font-size:11px;margin-top:6px}}
+:root{color-scheme:dark;--cyan:#70f5ff;--red:#ff4757;--gold:#ffc857}*{box-sizing:border-box}body{margin:0;background:#05070b;color:#fff;font-family:Arial,sans-serif;overflow:hidden}button,input{font:inherit}button{cursor:pointer;border:1px solid #7cecf4;background:#101a25;color:#eaffff;padding:10px 14px;border-radius:8px;font-weight:700}button:hover{background:#183345}button:disabled{opacity:.5;cursor:default}.back{position:fixed;z-index:50;top:14px;right:14px;text-decoration:none;color:#fff;border:1px solid #ffffff66;background:#05070bcc;padding:9px 13px;border-radius:8px}.setup{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 30%,#173043,#05070b 65%);padding:20px}.panel{width:min(620px,100%);padding:28px;border:1px solid #70f5ff66;border-radius:18px;background:#071018eF;box-shadow:0 0 60px #00c8ff1c}.panel h1{font-family:'Shojumaru',Arial,sans-serif;font-size:clamp(30px,6vw,52px);letter-spacing:3px;margin:0 0 6px;text-transform:uppercase;color:#d8faff;text-shadow:0 0 20px rgba(112,245,255,0.4)}.sub{color:#9bc6d1;margin:0 0 22px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.joinrow{display:flex;gap:8px;margin:12px 0}.joinrow input{flex:1;min-width:0;background:#0b1118;border:1px solid #45606b;color:white;border-radius:8px;padding:10px;text-transform:uppercase}.notice{min-height:24px;color:#ffd477;font-size:14px}.rules{font-size:13px;line-height:1.6;color:#bfd1d9}.arena{position:fixed;inset:0;display:none;background:#000}.arena.show{display:block}#remoteVideo{position:absolute;width:100%;height:100%;inset:0;object-fit:cover;background:radial-gradient(circle,#1a2835,#020305);z-index:1;transform:scaleX(-1)}#remotePlaceholder{position:absolute;z-index:2;inset:0;display:grid;place-items:center;color:#9db7c4;text-align:center;background:linear-gradient(135deg,#111c26,#030507);pointer-events:none}#remotePlaceholder strong{display:block;font-size:clamp(22px,4vw,44px);letter-spacing:4px;color:#d8faff}#remotePlaceholder span{font-size:14px}.vignette{position:absolute;z-index:3;inset:0;pointer-events:none;background:linear-gradient(180deg,#000b 0%,transparent 25%,transparent 65%,#0009 100%),radial-gradient(ellipse,transparent 45%,#0008 100%)}#localVideo{position:absolute;z-index:7;right:18px;bottom:18px;width:min(22vw,260px);min-width:130px;aspect-ratio:4/3;object-fit:cover;transform:scaleX(-1);border:2px solid var(--cyan);border-radius:12px;background:#111;box-shadow:0 0 24px #00d9ff44}#crosshair{position:absolute;z-index:10;left:50%;top:50%;width:26px;height:26px;transform:translate(-50%,-50%);pointer-events:none;display:none;border:2px solid #ff3b56;border-radius:50%;box-shadow:0 0 12px #ff1744, inset 0 0 8px #ff174466;transition:transform .12s,box-shadow .12s,border-color .12s}#crosshair:before,#crosshair:after{content:"";position:absolute;background:#ff4059;left:50%;top:50%;transform:translate(-50%,-50%)}#crosshair:before{width:46px;height:2px}#crosshair:after{width:2px;height:46px}#crosshair.glow{border-color:#ffe600;box-shadow:0 0 18px #ffea00,0 0 35px #ff1744,0 0 55px #ff0055,inset 0 0 12px #ffea00;animation:pointerGlowPulse .45s infinite alternate ease-in-out}#crosshair.glow:before,#crosshair.glow:after{background:#ffe600;box-shadow:0 0 12px #ffea00,0 0 20px #ff1744}@keyframes pointerGlowPulse{0%{transform:translate(-50%,-50%) scale(1.05);filter:drop-shadow(0 0 8px #ffea00) brightness(1.2)}100%{transform:translate(-50%,-50%) scale(1.35);filter:drop-shadow(0 0 18px #ff1744) brightness(1.7)}}#opponentCrosshair{position:absolute;z-index:9;left:50%;top:50%;width:26px;height:26px;transform:translate(-50%,-50%);pointer-events:none;display:none;border:2px solid #70f5ff;border-radius:50%;box-shadow:0 0 12px #00d9ff,inset 0 0 8px #00d9ff66;transition:transform .12s,box-shadow .12s,border-color .12s}#opponentCrosshair:before,#opponentCrosshair:after{content:'';position:absolute;background:#70f5ff;left:50%;top:50%;transform:translate(-50%,-50%)}#opponentCrosshair:before{width:46px;height:2px}#opponentCrosshair:after{width:2px;height:46px}#opponentCrosshair.glow{border-color:#00ffff;box-shadow:0 0 20px #00ffff,0 0 38px #00a8ff,0 0 60px #70f5ff,inset 0 0 12px #00ffff;animation:opponentPointerGlowPulse .45s infinite alternate ease-in-out}#opponentCrosshair.glow:before,#opponentCrosshair.glow:after{background:#00ffff;box-shadow:0 0 12px #00ffff,0 0 22px #00d9ff}@keyframes opponentPointerGlowPulse{0%{transform:translate(-50%,-50%) scale(1.05);filter:drop-shadow(0 0 8px #00ffff) brightness(1.2)}100%{transform:translate(-50%,-50%) scale(1.35);filter:drop-shadow(0 0 18px #0088ff) brightness(1.7)}}#headTarget{position:absolute;z-index:4;display:none;border:1.5px dotted #ff3b56;border-radius:4px;background:rgba(255,59,86,0.08);box-shadow:0 0 12px rgba(255,59,86,0.45),inset 0 0 8px rgba(255,59,86,0.18);pointer-events:none;will-change:left,top,width,height}#headTarget:after{content:'RIVAL HEAD';position:absolute;left:50%;top:-22px;transform:translateX(-50%);font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px;font-weight:800;letter-spacing:1.5px;color:#ff6b81;text-shadow:0 1px 5px #000,0 0 8px rgba(255,59,86,0.7);white-space:nowrap}#headTarget.assist{border-color:#ff3b56;box-shadow:0 0 10px rgba(255,59,86,0.35)}#headTarget.assist:after{content:'AIM AT HEAD';color:#ff8a9e}#localHeadTarget{position:absolute;z-index:8;display:none;border:1.5px dotted #ff3b56;border-radius:4px;background:rgba(255,59,86,0.08);box-shadow:0 0 10px rgba(255,59,86,0.45),inset 0 0 6px rgba(255,59,86,0.15);pointer-events:none;will-change:left,top,width,height}#localHeadTarget:after{content:'YOU';position:absolute;left:50%;top:-18px;transform:translateX(-50%);font-family:'Barlow Condensed',Arial,sans-serif;font-size:10px;font-weight:800;letter-spacing:1.2px;color:#ff6b81;text-shadow:0 1px 4px #000,0 0 6px rgba(255,59,86,0.8);white-space:nowrap}.hud{position:absolute;z-index:8;left:18px;top:16px;width:min(430px,calc(100vw - 36px));pointer-events:none}.healthrow{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;margin-bottom:10px;text-shadow:0 2px 4px #000}.healthrow .name{font-family:'Barlow Condensed',Arial,sans-serif;font-size:14px;letter-spacing:2px;font-weight:800}.bar{height:13px;background:#171c25;border:1px solid #ffffff80;box-shadow:0 2px 8px #000;overflow:hidden;border-radius:3px;margin-top:4px}.fill{height:100%;width:100%;background:linear-gradient(90deg,#19db91,#a8ffbd);transition:width .18s}.fill.enemy{background:linear-gradient(90deg,#ed2c45,#ff9d66)}.healthnum{font-family:'Barlow Condensed',Arial,sans-serif;font-weight:800;font-size:16px}.log{position:absolute;z-index:9;left:18px;bottom:18px;width:min(360px,calc(100vw - 36px));background:#02060bd9;border:1px solid #ffffff33;border-radius:10px;padding:10px 13px;max-height:24vh;overflow:hidden;font-size:12px;line-height:1.55;color:#d9f8ff}.log strong{color:var(--gold)}.moves{position:absolute;z-index:30;right:14px;top:62px;width:min(260px,calc(100vw - 28px));background:#02060bd9;border:1px solid #ffffff40;border-radius:10px;padding:11px 13px;font-size:12px;line-height:1.6}.moves h3{margin:0 0 5px;color:var(--cyan);font-size:14px;letter-spacing:2px;font-family:'Barlow Condensed',Arial,sans-serif}.move{display:flex;justify-content:space-between;gap:8px;border-top:1px solid #ffffff18;padding:5px 0;position:relative;transition:opacity .2s,filter .2s}.move b{color:#fff}.move span{color:#ffd477;text-align:right}.move.on-cooldown{opacity:.45;filter:grayscale(.75)}.move .cd-status{color:#70f5ff;font-weight:700}.move.on-cooldown .cd-status{color:#ff6b81;font-weight:800}.move-cd-bar{position:absolute;left:0;bottom:0;height:2px;background:linear-gradient(90deg,#ff3b56,#ffea00);width:0%;pointer-events:none}.sign-box{margin-top:10px;padding:9px 11px;background:linear-gradient(135deg,rgba(0,240,255,0.18) 0%,rgba(3,20,32,0.92) 100%);border:1.5px solid #00f0ff;border-radius:9px;box-shadow:0 0 18px rgba(0,240,255,0.4),inset 0 0 10px rgba(0,240,255,0.18)}.sign-box-title{display:flex;align-items:center;gap:6px;font-family:'Barlow Condensed',Arial,sans-serif;font-size:11px;font-weight:800;letter-spacing:1.8px;color:#70f5ff;text-transform:uppercase;margin-bottom:4px;text-shadow:0 0 8px rgba(112,245,255,0.75)}.sign-box-title:before{content:'';display:inline-block;width:7px;height:7px;background:#00f0ff;border-radius:50%;box-shadow:0 0 8px #00f0ff;animation:signPulse 1.8s infinite ease-in-out}@keyframes signPulse{0%,100%{opacity:.5;transform:scale(.9)}50%{opacity:1;transform:scale(1.2)}}#gestureStatus{font-family:'Barlow Condensed',Arial,sans-serif;font-size:17px;font-weight:700;line-height:1.35;letter-spacing:.6px;color:#00f0ff;text-shadow:0 0 10px rgba(0,240,255,0.85),0 1px 3px #000;word-break:break-word}.sound-toggle-btn{margin-top:10px;width:100%;padding:7px 10px;font-family:'Barlow Condensed',Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:7px;border:1.5px solid #00f0ff;background:rgba(3,20,32,0.9);color:#70f5ff;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;pointer-events:auto;box-shadow:0 0 10px rgba(0,240,255,0.25);transition:all 0.2s ease}.sound-toggle-btn:hover{background:rgba(10,40,60,0.95);border-color:#70f5ff;box-shadow:0 0 16px rgba(0,240,255,0.5);color:#fff}.sound-toggle-btn.sound-off{border-color:#ff5252;color:#ff8a80;box-shadow:0 0 10px rgba(255,82,82,0.25)}.sound-toggle-btn.sound-off:hover{background:rgba(45,10,15,0.95);border-color:#ff5252;box-shadow:0 0 16px rgba(255,82,82,0.5);color:#fff}.local-sign-badge{position:absolute;z-index:8;right:18px;bottom:calc(min(22vw, 260px) * 0.75 + 26px);width:min(22vw, 260px);min-width:130px;display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(4,18,28,0.92);border:1.5px solid #00f0ff;border-radius:8px;box-shadow:0 0 14px rgba(0,240,255,0.4),inset 0 0 8px rgba(0,240,255,0.15);font-family:'Barlow Condensed',Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:#00f0ff;text-shadow:0 0 8px rgba(0,240,255,0.75),0 1px 2px #000;pointer-events:none}.local-sign-badge .label{font-size:11px;font-weight:800;letter-spacing:1.5px;color:#8beaff;opacity:.9}.local-sign-badge .sign-val{font-size:16px;font-weight:800;color:#00f0ff}.fx{position:absolute;z-index:6;left:50%;top:50%;width:min(42vw,540px);height:auto;transform:translate(-50%,-50%);pointer-events:none;mix-blend-mode:screen;object-fit:contain}.statuspill{position:absolute;z-index:12;left:50%;top:18px;transform:translateX(-50%);padding:8px 13px;background:#000b;border:1px solid #ffffff35;border-radius:999px;font-size:12px;white-space:nowrap;max-width:45vw;overflow:hidden;text-overflow:ellipsis}.centerMessage{position:absolute;z-index:20;inset:0;display:none;place-items:center;background:#000b;text-align:center;padding:20px}.centerMessage.show{display:grid}.centerMessage h2{font-family:'Shojumaru',Arial,sans-serif;font-size:clamp(32px,7vw,68px);letter-spacing:3px;margin:0 0 10px}.centerMessage p{color:#c5e3ed}.centerMessage button{pointer-events:auto}.small{font-size:12px;color:#9bb7c3}.damage-popup{position:absolute;z-index:25;pointer-events:none;font-family:'Barlow Condensed','Shojumaru',Arial,sans-serif;font-weight:800;font-size:clamp(44px,7vw,76px);letter-spacing:2px;line-height:1;user-select:none;will-change:transform,opacity;animation:damageFloat 1.25s cubic-bezier(0.15,0.85,0.35,1.2) forwards}.damage-popup.red{color:#ff3b56;text-shadow:0 0 10px #ff1744,0 0 25px rgba(255,23,68,0.9),0 0 50px rgba(255,59,86,0.7),0 3px 6px #000,0 5px 12px rgba(0,0,0,0.95);filter:drop-shadow(0 0 10px rgba(255,23,68,0.85))}.damage-popup.cyan{color:#70f5ff;text-shadow:0 0 10px #00d9ff,0 0 25px rgba(0,217,255,0.9),0 0 50px rgba(112,245,255,0.7),0 3px 6px #000,0 5px 12px rgba(0,0,0,0.95);filter:drop-shadow(0 0 10px rgba(0,217,255,0.85))}@keyframes damageFloat{0%{opacity:0;transform:translate(-50%,-20%) scale(0.35)}15%{opacity:1;transform:translate(-50%,-60%) scale(1.35)}30%{transform:translate(-50%,-85%) scale(1)}75%{opacity:1;transform:translate(-50%,-125%) scale(0.95)}100%{opacity:0;transform:translate(-50%,-165%) scale(0.8)}}@keyframes hitShake{0%,100%{transform:translate(0,0)}20%{transform:translate(-6px,4px)}40%{transform:translate(6px,-4px)}60%{transform:translate(-4px,-3px)}80%{transform:translate(3px,3px)}}.arena.hit-shake{animation:hitShake 0.35s ease-out}@media(max-width:700px){.back{top:8px;right:8px;padding:6px 10px;font-size:11px}.moves{width:180px;right:8px;top:44px;font-size:10px;padding:7px}.hud{left:8px;top:8px;width:calc(100vw - 200px)}.healthrow .name{font-size:10px}.bar{height:10px}#localVideo{right:8px;bottom:8px;width:145px}.local-sign-badge{right:8px;bottom:calc(145px * 0.75 + 14px);width:145px;padding:4px 6px;font-size:11px}.local-sign-badge .sign-val{font-size:13px}#gestureStatus{font-size:14px}.sign-box{padding:6px 8px;margin-top:6px}.sign-box-title{font-size:10px}.log{left:8px;bottom:8px;width:calc(100vw - 175px);font-size:10px}.statuspill{top:12px;font-size:10px}.sound-toggle-btn{padding:5px 8px;font-size:11px;margin-top:6px}}
 </style>
 <script src="/socket.io/socket.io.js"></script>
 <script>if(typeof io==='undefined'){document.write('<script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.8.1/dist/socket.io.min.js"><\\/script>');}</script>
@@ -37,10 +37,10 @@
   </div>
   <div class="statuspill" id="battleStatus">Waiting for rival…</div>
   <div class="moves"><h3>JUTSU SCROLL</h3>
-    <div class="move"><b>Fireball</b><span>👌🏼 Horse › 👉🏼 Rat › 🤙🏼 Tiger<br>18 DMG</span></div>
-    <div class="move"><b>Chidori</b><span>✊🏼 Fist › ☝🏼 Dog › ✋🏼 Open<br>25 DMG</span></div>
-    <div class="move"><b>Rasenshuriken</b><span>✌🏼 Peace › ✊🏼 Fist › ✋🏼 Open<br>22 DMG</span></div>
-    <div class="move"><b>Hollow Purple</b><span>🤘🏼 Horns › ✊🏼 Fist › ✌🏼 Peace<br>35 DMG</span></div>
+    <div class="move" id="move-fireball"><b>Fireball</b><span>👌🏼 Horse › 👉🏼 Rat › 🤙🏼 Tiger<br>18 DMG · <span class="cd-status">5s CD</span></span><div class="move-cd-bar"></div></div>
+    <div class="move" id="move-chidori"><b>Chidori</b><span>✊🏼 Fist › ☝🏼 Dog › ✋🏼 Open<br>25 DMG · <span class="cd-status">7.5s CD</span></span><div class="move-cd-bar"></div></div>
+    <div class="move" id="move-rasenshuriken"><b>Rasenshuriken</b><span>✌🏼 Peace › ✊🏼 Fist › ✋🏼 Open<br>22 DMG · <span class="cd-status">6.5s CD</span></span><div class="move-cd-bar"></div></div>
+    <div class="move" id="move-hollowPurple"><b>Hollow Purple</b><span>🤘🏼 Horns › ✊🏼 Fist › ✌🏼 Peace<br>35 DMG · <span class="cd-status">10s CD</span></span><div class="move-cd-bar"></div></div>
     <div class="sign-box">
       <div class="sign-box-title">CURRENT HAND SIGN</div>
       <div id="gestureStatus">Show hand to camera · Keys 1–4 test</div>
@@ -144,11 +144,43 @@ const SIGNS = {
  purpleStart: { name: "Index+Pinky",   emoji: "🤘🏼" }
 };
 const ATTACKS = {
- fireball:{name:'Fireball Jutsu',src:'assets/fireball_justsu.mp4',damage:18,seq:['horse','rat','tiger'],type:'fireball'},
- chidori:{name:'Chidori',src:'assets/sasuke.mp4',damage:25,seq:['fist','dog','open'],type:'chidori'},
- rasenshuriken:{name:'Rasenshuriken',src:'assets/naruto.mp4',damage:22,seq:['peace','fist','open'],type:'rasenshuriken'},
- hollowPurple:{name:'Hollow Purple',src:'assets/Hollow%20purple.mp4',damage:35,seq:['purpleStart','fist','peace'],type:'hollowPurple'}
+ fireball:     { name: 'Fireball Jutsu', src: 'assets/fireball_justsu.mp4', damage: 18, cd: 5.0,  seq: ['horse','rat','tiger'],       type: 'fireball' },
+ rasenshuriken:{ name: 'Rasenshuriken',  src: 'assets/naruto.mp4',          damage: 22, cd: 6.5,  seq: ['peace','fist','open'],       type: 'rasenshuriken' },
+ chidori:      { name: 'Chidori',        src: 'assets/sasuke.mp4',          damage: 25, cd: 7.5,  seq: ['fist','dog','open'],         type: 'chidori' },
+ hollowPurple: { name: 'Hollow Purple',  src: 'assets/Hollow%20purple.mp4', damage: 35, cd: 10.0, seq: ['purpleStart','fist','peace'], type: 'hollowPurple' }
 };
+const jutsuCooldownEnd = { fireball: 0, chidori: 0, rasenshuriken: 0, hollowPurple: 0 };
+function getCooldownRemaining(type){
+ const end = jutsuCooldownEnd[type] || 0;
+ const diff = (end - performance.now()) / 1000;
+ return diff > 0 ? diff : 0;
+}
+function startCooldown(type){
+ const attack = ATTACKS[type];
+ if(!attack) return;
+ jutsuCooldownEnd[type] = performance.now() + (attack.cd * 1000);
+}
+function resetCooldowns(){
+ for(const k in jutsuCooldownEnd) jutsuCooldownEnd[k] = 0;
+}
+function updateCooldownsUI(){
+ for(const [type, atk] of Object.entries(ATTACKS)){
+  const el = $('move-' + type);
+  if(!el) continue;
+  const rem = getCooldownRemaining(type);
+  const cdBadge = el.querySelector('.cd-status');
+  const cdBar = el.querySelector('.move-cd-bar');
+  if(rem > 0){
+   el.classList.add('on-cooldown');
+   if(cdBadge) cdBadge.textContent = `⏳ ${rem.toFixed(1)}s`;
+   if(cdBar) cdBar.style.width = Math.min(100, Math.max(0, (rem / atk.cd) * 100)) + '%';
+  } else {
+   el.classList.remove('on-cooldown');
+   if(cdBadge) cdBadge.textContent = `${atk.cd}s CD`;
+   if(cdBar) cdBar.style.width = '0%';
+  }
+ }
+}
 function say(text){if(notice)notice.textContent=text}
 function log(text){const line=document.createElement('div');line.textContent=text;logBox.appendChild(line);while(logBox.children.length>5)logBox.removeChild(logBox.firstChild)}
 function setStatus(text){battleStatus.textContent=text}
@@ -203,13 +235,28 @@ else{
  });
  socket.on('opponent-attack',d=>{playFx(d.type,d.x,d.y);if(d.hit)log('RIVAL LANDED A HIT! Brace yourself.');else log('Rival’s jutsu missed your head.')});
  socket.on('opponent-aim-position', d=>{
-  if(!d || d.visible!==true){lastOpponentAim=null;opponentCrosshair.style.display='none';opponentCrosshair.classList.remove('glow');return;}
-  lastOpponentAim={x:Math.max(0,Math.min(1,Number(d.x)||0)),y:Math.max(0,Math.min(1,Number(d.y)||0))};
-  if(typeof d.charged === 'boolean'){opponentCrosshair.classList.toggle('glow', d.charged);}
+  if(!d || d.visible!==true){
+   lastOpponentAim=null;
+   if(opponentCrosshair){
+    opponentCrosshair.style.display='none';
+    opponentCrosshair.classList.remove('glow');
+   }
+   return;
+  }
+  lastOpponentAim={
+   x:Math.max(0,Math.min(1,Number(d.x)||0)),
+   y:Math.max(0,Math.min(1,Number(d.y)||0)),
+   visible: true
+  };
+  if(opponentCrosshair && typeof d.charged === 'boolean'){
+   opponentCrosshair.classList.toggle('glow', d.charged);
+  }
   positionOpponentCrosshair();
  });
  socket.on('opponent-charged', d=>{
-  opponentCrosshair.classList.toggle('glow', Boolean(d && d.charged));
+  if(opponentCrosshair){
+   opponentCrosshair.classList.toggle('glow', Boolean(d && d.charged));
+  }
  });
  socket.on('opponent-head-position', d=>{
   if(!d || d.visible!==true)return;
@@ -235,22 +282,31 @@ else{
   }
  });
  socket.on('battle-over',d=>{gameOver=true;$('endScreen').classList.add('show');$('endTitle').textContent=(socket&&d.winner===socket.id)?'VICTORY':'DEFEAT';$('endText').textContent=(socket&&d.winner===socket.id)?'Your rival’s health is exhausted.':'Your health has faded. Train and return.';setStatus('Battle over');});
- socket.on('rematch-started',()=>{gameOver=false;sequence=[];$('endScreen').classList.remove('show');log('Rematch begins. May the sharper shinobi prevail.');});
+ socket.on('rematch-started',()=>{gameOver=false;sequence=[];resetCooldowns();$('endScreen').classList.remove('show');log('Rematch begins. May the sharper shinobi prevail.');});
 }
 function positionOpponentCrosshair(){
- if(!lastOpponentAim)return;
- // Map the sender's mirrored-camera coordinates into the exact visible object-fit:cover crop.
- const rect=remoteVideo.getBoundingClientRect();
- let x=rect.left+lastOpponentAim.x*rect.width, y=rect.top+lastOpponentAim.y*rect.height;
- if(remoteVideo.videoWidth&&remoteVideo.videoHeight){
-  const scale=Math.max(rect.width/remoteVideo.videoWidth,rect.height/remoteVideo.videoHeight);
-  const renderedW=remoteVideo.videoWidth*scale,renderedH=remoteVideo.videoHeight*scale;
-  const cropX=(renderedW-rect.width)/2, cropY=(renderedH-rect.height)/2;
-  x=rect.left+lastOpponentAim.x*renderedW-cropX;
-  y=rect.top+lastOpponentAim.y*renderedH-cropY;
+ if(!lastOpponentAim || lastOpponentAim.visible !== true || !opponentCrosshair) return;
+ const rect = (remoteVideo && remoteVideo.getBoundingClientRect && remoteVideo.getBoundingClientRect()) || { left:0, top:0, width:innerWidth, height:innerHeight };
+ const rw = (rect && rect.width > 20) ? rect.width : innerWidth;
+ const rh = (rect && rect.height > 20) ? rect.height : innerHeight;
+ const rleft = (rect && rect.width > 20) ? rect.left : 0;
+ const rtop = (rect && rect.height > 20) ? rect.top : 0;
+
+ let x = rleft + lastOpponentAim.x * rw;
+ let y = rtop + lastOpponentAim.y * rh;
+
+ if(remoteVideo && remoteVideo.videoWidth && remoteVideo.videoHeight && rw > 20 && rh > 20){
+  const scale = Math.max(rw / remoteVideo.videoWidth, rh / remoteVideo.videoHeight);
+  const renderedW = remoteVideo.videoWidth * scale;
+  const renderedH = remoteVideo.videoHeight * scale;
+  const cropX = (renderedW - rw) / 2;
+  const cropY = (renderedH - rh) / 2;
+  x = rleft + lastOpponentAim.x * renderedW - cropX;
+  y = rtop + lastOpponentAim.y * renderedH - cropY;
  }
- opponentCrosshair.style.left=x+'px';opponentCrosshair.style.top=y+'px';
- opponentCrosshair.style.display='block';
+ opponentCrosshair.style.left = x + 'px';
+ opponentCrosshair.style.top = y + 'px';
+ opponentCrosshair.style.display = 'block';
 }
 remoteVideo.addEventListener('loadedmetadata',()=>{positionOpponentCrosshair();updateHeadTarget()});
 function showArena(){setup.style.display='none';arena.classList.add('show');startTracking();}
@@ -351,18 +407,24 @@ async function startTracking(){
    }
   });
   let lastVideoTime=-1;
+  let isHandsBusy = false, isLocalFaceBusy = false;
   async function loop(){
-   if(localVideo.readyState>=2&&localVideo.videoWidth>0&&localVideo.currentTime!==lastVideoTime){
+   if(localVideo.readyState>=2 && localVideo.videoWidth>0 && localVideo.currentTime!==lastVideoTime){
     lastVideoTime=localVideo.currentTime;
-    try{await hands.send({image:localVideo})}catch(e){console.warn(e)}
+    if(!isHandsBusy && hands){
+     isHandsBusy = true;
+     hands.send({image:localVideo}).catch(e=>console.warn('Hands error', e)).finally(()=>{ isHandsBusy = false; });
+    }
     if(window.USE_PYTHON_DETECTOR){
      sendFrameToPython();
-    } else if(faceMesh && performance.now()-lastLocalFaceScanAt > 35){
+    } else if(faceMesh && !isLocalFaceBusy && performance.now()-lastLocalFaceScanAt > 35){
      lastLocalFaceScanAt=performance.now();
-     try{await faceMesh.send({image:localVideo})}catch(e){}
-    } else if(faceDetection && performance.now()-lastLocalFaceScanAt > 50){
+     isLocalFaceBusy = true;
+     faceMesh.send({image:localVideo}).catch(()=>{ }).finally(()=>{ isLocalFaceBusy = false; });
+    } else if(faceDetection && !isLocalFaceBusy && performance.now()-lastLocalFaceScanAt > 50){
      lastLocalFaceScanAt=performance.now();
-     try{await faceDetection.send({image:localVideo})}catch(e){}
+     isLocalFaceBusy = true;
+     faceDetection.send({image:localVideo}).catch(()=>{ }).finally(()=>{ isLocalFaceBusy = false; });
     }
    }
    requestAnimationFrame(loop);
@@ -407,6 +469,11 @@ function onHandResults(results){
  if(seqIndex===0){
   const found=Object.values(ATTACKS).find(a=>a.seq[0]===sign);
   if(found){
+   const cdRem = getCooldownRemaining(found.type);
+   if(cdRem > 0){
+    gestureStatus.textContent=`⏳ ${found.name} COOLDOWN (${cdRem.toFixed(1)}s left)`;
+    return;
+   }
    currentJutsu=found;
    seqIndex=1;
    setLocalCharged(false);
@@ -430,6 +497,12 @@ function onHandResults(results){
   } else {
    const restart=Object.values(ATTACKS).find(a=>a.seq[0]===sign);
    if(restart){
+    const cdRem = getCooldownRemaining(restart.type);
+    if(cdRem > 0){
+     gestureStatus.textContent=`⏳ ${restart.name} COOLDOWN (${cdRem.toFixed(1)}s left)`;
+     currentJutsu=null; seqIndex=0; setLocalCharged(false);
+     return;
+    }
     currentJutsu=restart; seqIndex=1; setLocalCharged(false); lastAcceptedSign=sign; lastAcceptedAt=now;
     const next=SIGNS[currentJutsu.seq[1]];
     gestureStatus.textContent=`Switched: ${currentJutsu.name}: ${SIGNS[sign].name} ${SIGNS[sign].emoji} (1/3) → Next: ${next.name} ${next.emoji}`;
@@ -448,6 +521,12 @@ function onHandResults(results){
   } else {
    const restart=Object.values(ATTACKS).find(a=>a.seq[0]===sign);
    if(restart){
+    const cdRem = getCooldownRemaining(restart.type);
+    if(cdRem > 0){
+     gestureStatus.textContent=`⏳ ${restart.name} COOLDOWN (${cdRem.toFixed(1)}s left)`;
+     currentJutsu=null; seqIndex=0; setLocalCharged(false);
+     return;
+    }
     currentJutsu=restart; seqIndex=1; setLocalCharged(false); lastAcceptedSign=sign; lastAcceptedAt=now;
     const next=SIGNS[currentJutsu.seq[1]];
     gestureStatus.textContent=`Switched: ${currentJutsu.name}: ${SIGNS[sign].name} ${SIGNS[sign].emoji} (1/3) → Next: ${next.name} ${next.emoji}`;
@@ -637,6 +716,8 @@ function renderHeadTargetLoop(){
   headTarget.style.display='none';
  }
  updateLocalHeadTarget();
+ positionOpponentCrosshair();
+ updateCooldownsUI();
  requestAnimationFrame(renderHeadTargetLoop);
 }
 requestAnimationFrame(renderHeadTargetLoop);
@@ -649,12 +730,18 @@ function pointInsideHead(x,y){
 function triggerAttack(attack){
  if(!socket)return;
  if(!peerReady){setStatus(roomCode ? 'Waiting for rival to connect to room '+roomCode+'…' : 'Join or create a room first');return}
- if(performance.now()-lastAttackAt<700)return;lastAttackAt=performance.now();
+ const cdRem = getCooldownRemaining(attack.type);
+ if(cdRem > 0){
+  setStatus(`⏳ ${attack.name} cooling down (${cdRem.toFixed(1)}s left)`);
+  return;
+ }
+ if(performance.now()-lastAttackAt<500)return;lastAttackAt=performance.now();
+ startCooldown(attack.type);
  const hit=pointInsideHead(latestFinger.x,latestFinger.y);
  playFx(attack.type,latestFinger.x,latestFinger.y);
  socket.emit('attack',{type:attack.type,x:latestFinger.x,y:latestFinger.y,hit});
  log(hit?`${attack.name} — HEAD HIT!`:`${attack.name} — missed the head.`);
- setStatus(hit?`${attack.name}: DIRECT HIT`:`${attack.name}: MISS — aim inside the cyan head target`);
+ setStatus(hit?`${attack.name}: DIRECT HIT`:`${attack.name}: MISS — aim inside the red target`);
 }
 // Diagnostic/manual test: press 1–4 during battle to trigger the matching jutsu using
 // the current hand crosshair. This helps separate gesture-recognition problems from hit logic.
@@ -663,7 +750,14 @@ window.addEventListener('keydown',e=>{
  const types=['fireball','chidori','rasenshuriken','hollowPurple'];
  if(e.key>='1'&&e.key<='4'){
   const attack=ATTACKS[types[Number(e.key)-1]];
-  if(attack)triggerAttack(attack);
+  if(attack){
+   const cdRem = getCooldownRemaining(attack.type);
+   if(cdRem > 0){
+    setStatus(`⏳ ${attack.name} on cooldown (${cdRem.toFixed(1)}s left)`);
+    return;
+   }
+   triggerAttack(attack);
+  }
  }
 });
 function playFx(type,x,y){
@@ -700,25 +794,10 @@ const offCtx = offCanvas.getContext('2d');
 async function startFaceDetection(){
  if(!remoteVideo.srcObject||faceLoopStream===remoteVideo.srcObject)return;
  const thisRun=remoteVideo.srcObject; faceLoopStream=thisRun;
- if(typeof FaceMesh !== 'undefined' && !remoteFaceMesh){
-  remoteFaceMesh = new FaceMesh({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`});
-  remoteFaceMesh.setOptions({maxNumFaces:1,refineLandmarks:false,minDetectionConfidence:.45,minTrackingConfidence:.45});
-  remoteFaceMesh.onResults(results=>{
-   const lms = results.multiFaceLandmarks && results.multiFaceLandmarks[0];
-   if(lms){
-    const b = computeBoxFromFacePoints(lms);
-    if(b){
-     lastFaceSeenAt = performance.now();
-     faceBox = { x: 1 - (b.x + b.w), y: b.y, w: b.w, h: b.h };
-    }
-   }
-  });
- }
- if(!remoteFaceDetector){
+ if(!remoteFaceDetector && typeof FaceDetection !== 'undefined'){
   remoteFaceDetector = new FaceDetection({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${f}`});
   remoteFaceDetector.setOptions({model:'short',minDetectionConfidence:.45});
   remoteFaceDetector.onResults(results=>{
-   if(remoteFaceMesh) return;
    const det=results.detections&&results.detections[0];const loc=det&&det.locationData;const b=loc&&loc.relativeBoundingBox;
    if(b){
     lastFaceSeenAt = performance.now();
@@ -727,17 +806,16 @@ async function startFaceDetection(){
   });
  }
  while(remoteVideo.srcObject===thisRun){
-  if(remoteVideo.readyState>=2 && remoteVideo.videoWidth > 0 && !isFaceProcessing && performance.now()-lastFaceAt > 40){
-   lastFaceAt=performance.now();
+  const now = performance.now();
+  if(remoteVideo.readyState>=2 && remoteVideo.videoWidth > 0 && !isFaceProcessing && (now - lastFaceSeenAt > 900) && (now - lastFaceAt > 100)){
+   lastFaceAt=now;
    isFaceProcessing = true;
    try{
     if(offCanvas.width !== 320 || offCanvas.height !== 240){
      offCanvas.width = 320; offCanvas.height = 240;
     }
     offCtx.drawImage(remoteVideo, 0, 0, offCanvas.width, offCanvas.height);
-    if(remoteFaceMesh){
-     await remoteFaceMesh.send({image:offCanvas});
-    } else if(remoteFaceDetector){
+    if(remoteFaceDetector){
      await remoteFaceDetector.send({image:offCanvas});
     }
    }catch(e){
