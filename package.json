@@ -6,7 +6,8 @@
     "start": "npm start --prefix \"Naruto game 3\"",
     "tunnel": "npm run tunnel --prefix \"Naruto game 3\"",
     "localtunnel": "npm run localtunnel --prefix \"Naruto game 3\"",
-    "cloudflare": "npm run cloudflare --prefix \"Naruto game 3\""
+    "cloudflare": "npm run cloudflare --prefix \"Naruto game 3\"",
+    "python-detector": "bash \"Naruto game 3/python_face_detection/start_python_service.sh\""
   }
 }
 
