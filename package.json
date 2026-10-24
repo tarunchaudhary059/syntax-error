@@ -1,0 +1,12 @@
+{
+  "name": "syntax-error",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npm start --prefix \"Naruto game 3\"",
+    "tunnel": "npm run tunnel --prefix \"Naruto game 3\"",
+    "localtunnel": "npm run localtunnel --prefix \"Naruto game 3\"",
+    "cloudflare": "npm run cloudflare --prefix \"Naruto game 3\""
+  }
+}
+

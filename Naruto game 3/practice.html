@@ -8,7 +8,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Shojumaru&family=Yuji+Boku&family=Reggae+One&family=Shippori+Mincho:wght@600;800&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Shojumaru&family=Yuji+Boku&family=Reggae+One&family=Shippori+Mincho:wght@600;800&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
@@ -216,124 +216,165 @@
       width: min(175.5vw, 2160px);
     }
 
-        #status {
+    .moves {
       position: absolute;
       z-index: 30;
-      left: 16px;
-      top: 16px;
-      width: min(255px, calc(100vw - 28px));
-      color: white;
-      background: rgba(0, 0, 0, 0.75);
-      border: 1px solid rgba(101, 247, 255, 0.35);
-      padding: 12px 14px;
+      left: 36px;
+      top: 36px;
+      width: min(260px, calc(100vw - 72px));
+      background: #02060bd9;
+      border: 1px solid #ffffff40;
       border-radius: 10px;
-      font-family: Arial, sans-serif;
-      font-size: 13.5px;
-      line-height: 1.45;
+      padding: 11px 13px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #fff;
       box-shadow: 0 4px 18px rgba(0, 0, 0, 0.55);
       user-select: none;
     }
 
-    #status > strong {
-      display: block;
-      color: #65f7ff; /* Cyan blue heading */
-      font-family: Arial, sans-serif;
-      font-size: 13.5px;
-      font-weight: bold;
-      letter-spacing: 0.8px;
-      margin-bottom: 5px;
-      text-shadow: 0 0 8px rgba(101, 247, 255, 0.45);
+    .moves h3 {
+      margin: 0 0 5px;
+      color: #70f5ff;
+      font-size: 14px;
+      letter-spacing: 2px;
+      font-family: 'Barlow Condensed', Arial, sans-serif;
+      text-transform: uppercase;
+    }
+
+    .move {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      border-top: 1px solid #ffffff18;
+      padding: 4px 0;
+      font-size: 12px;
+    }
+
+    .move b {
+      color: #fff;
+    }
+
+    .move span {
+      color: #ffd477;
+      text-align: right;
+      line-height: 1.35;
+    }
+
+    .sign-box {
+      margin-top: 10px;
+      padding: 9px 11px;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.18) 0%, rgba(3, 20, 32, 0.92) 100%);
+      border: 1.5px solid #00f0ff;
+      border-radius: 9px;
+      box-shadow: 0 0 18px rgba(0, 240, 255, 0.4), inset 0 0 10px rgba(0, 240, 255, 0.18);
+    }
+
+    .sign-box-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Barlow Condensed', Arial, sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.8px;
+      color: #70f5ff;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      text-shadow: 0 0 8px rgba(112, 245, 255, 0.75);
+    }
+
+    .sign-box-title:before {
+      content: '';
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: #00f0ff;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #00f0ff;
+      animation: signPulse 1.8s infinite ease-in-out;
+    }
+
+    @keyframes signPulse {
+      0%, 100% { opacity: .5; transform: scale(.9); }
+      50% { opacity: 1; transform: scale(1.2); }
     }
 
     #message {
-      color: #ffff00; /* Yellow color for current status of hands */
-      font-family: Arial, sans-serif;
-      font-size: 14.5px;
-      font-weight: bold;
-      margin: 6px 0 8px;
+      font-family: 'Barlow Condensed', Arial, sans-serif;
+      font-size: 16px;
+      font-weight: 700;
       line-height: 1.35;
-      text-shadow: 0 0 6px rgba(255, 255, 0, 0.35);
+      letter-spacing: .6px;
+      color: #00f0ff;
+      text-shadow: 0 0 10px rgba(0, 240, 255, 0.85), 0 1px 3px #000;
       word-break: break-word;
     }
 
-    #help {
-      color: #ddd;
-      font-family: Arial, sans-serif;
-      font-size: 11.5px;
-      margin-top: 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 3.5px;
-    }
-
-    .jutsu-line {
-      line-height: 1.35;
-      color: #e2e8f0;
-    }
-
-    /* 4 Different Colors for the Four Jutsus */
-    .j-rasen strong {
-      color: #38bdf8; /* Rasenshuriken: Cyan / Wind Blue */
-      text-shadow: 0 0 6px rgba(56, 189, 248, 0.4);
-    }
-    .j-chidori strong {
-      color: #a78bfa; /* Chidori: Lightning Violet */
-      text-shadow: 0 0 6px rgba(167, 139, 250, 0.4);
-    }
-    .j-fireball strong {
-      color: #ff7a1a; /* Fireball Jutsu: Flame Orange */
-      text-shadow: 0 0 6px rgba(255, 122, 26, 0.4);
-    }
-    .j-purple strong {
-      color: #e879f9; /* Hollow Purple: Mystic Purple */
-      text-shadow: 0 0 6px rgba(232, 121, 249, 0.4);
-    }
-
-    .help-note {
-      color: #94a3b8;
-      font-size: 10px;
-      margin-top: 4px;
-      font-style: italic;
-    }
-
-    #enableMp4Audio {
-      margin-top: 8px;
-      padding: 6px 10px;
-      color: #111;
-      background: #ffff00;
-      border: 0;
-      border-radius: 5px;
-      font-weight: bold;
-      font-family: Arial, sans-serif;
-      font-size: 11.5px;
-      cursor: pointer;
+    .sound-toggle-btn {
+      margin-top: 10px;
       width: 100%;
-      transition: background 0.15s ease;
+      padding: 7px 10px;
+      font-family: 'Barlow Condensed', Arial, sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-radius: 7px;
+      border: 1.5px solid #00f0ff;
+      background: rgba(3, 20, 32, 0.9);
+      color: #70f5ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      pointer-events: auto;
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+      transition: all 0.2s ease;
     }
-    #enableMp4Audio:hover {
-      background: #fff066;
+
+    .sound-toggle-btn:hover {
+      background: rgba(10, 40, 60, 0.95);
+      border-color: #70f5ff;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.5);
+      color: #fff;
     }
-    #enableMp4Audio:disabled {
-      background: #555;
-      color: #aaa;
-      cursor: default;
+
+    .sound-toggle-btn.sound-off {
+      border-color: #ff5252;
+      color: #ff8a80;
+      box-shadow: 0 0 10px rgba(255, 82, 82, 0.25);
+    }
+
+    .sound-toggle-btn.sound-off:hover {
+      background: rgba(45, 10, 15, 0.95);
+      border-color: #ff5252;
+      box-shadow: 0 0 16px rgba(255, 82, 82, 0.5);
+      color: #fff;
     }
 
     @media (max-width: 600px) {
-      #status {
-        left: 8px;
-        top: 8px;
-        width: min(230px, calc(100vw - 16px));
-        padding: 9px 11px;
+      .moves {
+        left: 10px;
+        top: 36px;
+        width: min(190px, calc(100vw - 20px));
+        font-size: 10px;
+        padding: 7px 9px;
       }
-      #status > strong {
+      .moves h3 {
         font-size: 12px;
       }
-      #message {
-        font-size: 13.5px;
+      .sign-box-title {
+        font-size: 10px;
       }
-      #help {
-        font-size: 10.5px;
+      #message {
+        font-size: 14px;
+      }
+      .sound-toggle-btn {
+        padding: 5px 8px;
+        font-size: 11px;
+        margin-top: 6px;
       }
     }
 
@@ -370,17 +411,17 @@
   <video id="hollowPurpleFx" class="fx"
     src="assets/Hollow%20purple.mp4" muted playsinline></video>
 
-  <div id="status">
-    <strong>NARUTO HAND-SIGN GAME</strong>
-    <div id="message">Show one hand to the camera.</div>
-    <div id="help">
-      <div class="jutsu-line j-rasen"><strong>Rasenshuriken:</strong> ✌🏼 Peace → ✊🏼 Fist → ✋🏼 Open</div>
-      <div class="jutsu-line j-chidori"><strong>Chidori:</strong> ✊🏼 Fist → ☝🏼 Dog → ✋🏼 Open</div>
-      <div class="jutsu-line j-fireball"><strong>Fireball Jutsu:</strong> 👌🏼 Horse → 👉🏼 Rat → 🤙🏼 Tiger</div>
-      <div class="jutsu-line j-purple"><strong>Hollow Purple:</strong> 🤘🏼 Horns → ✊🏼 Fist → ✌🏼 Peace</div>
-      <div class="help-note">Some signs are single-hand approximations.</div>
+  <div class="moves" id="status">
+    <h3>JUTSU SCROLL</h3>
+    <div class="move"><b>Fireball</b><span>👌🏼 Horse › 👉🏼 Rat › 🤙🏼 Tiger<br>18 DMG</span></div>
+    <div class="move"><b>Chidori</b><span>✊🏼 Fist › ☝🏼 Dog › ✋🏼 Open<br>25 DMG</span></div>
+    <div class="move"><b>Rasenshuriken</b><span>✌🏼 Peace › ✊🏼 Fist › ✋🏼 Open<br>22 DMG</span></div>
+    <div class="move"><b>Hollow Purple</b><span>🤘🏼 Horns › ✊🏼 Fist › ✌🏼 Peace<br>35 DMG</span></div>
+    <div class="sign-box">
+      <div class="sign-box-title">CURRENT HAND SIGN</div>
+      <div id="message">Show one hand to the camera.</div>
     </div>
-    <button id="enableMp4Audio" type="button">Enable MP4 audio</button>
+    <button id="enableMp4Audio" class="sound-toggle-btn sound-off" type="button">Sound: OFF 🔇</button>
   </div>
 
 <script>
@@ -405,14 +446,31 @@ const attackEffects = {
   "Hollow Purple": hollowPurpleFx
 };
 
+function unlockPracticeAudio(){
+  if(window.AudioContext || window.webkitAudioContext){
+    try{
+      if(!window.__audioContext) window.__audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      if(window.__audioContext.state === 'suspended') window.__audioContext.resume();
+    }catch(e){}
+  }
+}
+window.addEventListener('click', unlockPracticeAudio, { passive: true });
+window.addEventListener('keydown', unlockPracticeAudio, { passive: true });
+window.addEventListener('touchstart', unlockPracticeAudio, { passive: true });
+
+function updatePracticeAudioButton(){
+  enableMp4AudioButton.textContent = mp4AudioEnabled ? "Sound: ON 🔊" : "Sound: OFF 🔇";
+  enableMp4AudioButton.classList.toggle("sound-off", !mp4AudioEnabled);
+}
+
 enableMp4AudioButton.addEventListener("click", () => {
+  unlockPracticeAudio();
+  mp4AudioEnabled = !mp4AudioEnabled;
   Object.values(attackEffects).forEach(fx => {
-    fx.muted = false;
+    fx.muted = !mp4AudioEnabled;
   });
-  mp4AudioEnabled = true;
-  enableMp4AudioButton.textContent = "MP4 audio enabled";
-  enableMp4AudioButton.disabled = true;
-  message.textContent = "MP4 audio enabled. Perform an attack sequence.";
+  updatePracticeAudioButton();
+  message.textContent = mp4AudioEnabled ? "Sound enabled. Perform an attack sequence." : "Sound muted.";
 });
 
 const HOLD_MS = 300;
