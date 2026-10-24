@@ -1,0 +1,14 @@
+{
+  "name": "shinobi-jutsu-lan",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LAN webcam ninja battle game",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "tunnel": "ssh -o StrictHostKeyChecking=no -p 443 -R0:localhost:3000 a.pinggy.io",
+    "localtunnel": "npx localtunnel --port 3000",
+    "cloudflare": "npx untun@latest tunnel http://localhost:3000"
+  },
+  "dependencies": { "express": "^4.21.2", "socket.io": "^4.8.1" }
+}

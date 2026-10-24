@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shinobi Jutsu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shojumaru&family=Yuji+Boku&family=RocknRoll+One&family=Shippori+Mincho:wght@600;800&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="home.css">
+</head>
+<body>
+
+<!-- Background: put a looping clip at assets/bg.mp4. If it's missing, the gradient + embers show instead. -->
+<div class="bg" aria-hidden="true">
+  <div class="bg-fallback"></div>
+  <video id="bgVideo" autoplay muted loop playsinline preload="auto">
+    <source src="assets/bg.mp4" type="video/mp4">
+  </video>
+</div>
+<canvas id="embers" aria-hidden="true"></canvas>
+
+<button class="sound" id="soundBtn" type="button" aria-pressed="false">Sound off</button>
+
+<main>
+  <header class="title">
+    <span class="kanji" aria-hidden="true">忍</span>
+    <h1>Shinobi<br>Jutsu</h1>
+    <p class="tagline">Form the hand signs.<br>Unleash the technique.</p>
+  </header>
+
+  <nav aria-label="Main menu">
+    <a class="scroll-btn" href="battle.html" id="battleBtn">Battle Mode <small>PvP Jutsu Clash</small></a>
+    <a class="scroll-btn" href="practice.html">Practice Mode <small>Train your signs</small></a>
+    <button class="scroll-btn" type="button" id="howBtn">How to Play <small>Rules and jutsu</small></button>
+  </nav>
+</main>
+
+<div class="toast" id="toast" role="status"></div>
+
+<dialog id="howDialog" aria-labelledby="howTitle">
+  <div class="dlg-head">
+    <h2 id="howTitle">How to play</h2>
+    <button class="close" type="button" id="closeBtn">Close</button>
+  </div>
+  <div class="tabs" role="tablist">
+    <button role="tab" id="t-rules" aria-controls="p-rules" aria-selected="true">Rules</button>
+    <button role="tab" id="t-signs" aria-controls="p-signs" aria-selected="false">Hand signs</button>
+    <button role="tab" id="t-jutsu" aria-controls="p-jutsu" aria-selected="false">Jutsu</button>
+  </div>
+
+  <section class="panel" id="p-rules" role="tabpanel" aria-labelledby="t-rules">
+    <!-- EDIT these rules to match how your game really works -->
+    <ol>
+      <li>Choose Practice Mode to learn each jutsu without any pressure.</li>
+      <li>Perform the hand signs in front of your camera, in the exact order shown for the jutsu.</li>
+      <li>When the full sequence is recognised, the jutsu animation plays.</li>
+      <li>A wrong sign resets the sequence. Start again from the first sign.</li>
+      <li>In Battle Mode, connect with a rival on the same Wi-Fi. Aim your hand crosshair at their head and unleash your jutsu!</li>
+    </ol>
+  </section>
+
+  <section class="panel" id="p-signs" role="tabpanel" aria-labelledby="t-signs" hidden>
+    <div class="signs" id="signGrid"></div>
+  </section>
+
+  <section class="panel" id="p-jutsu" role="tabpanel" aria-labelledby="t-jutsu" hidden>
+    <div class="jutsu" id="jutsuList"></div>
+  </section>
+</dialog>
+
+<script src="home.js"></script>
+</body>
+</html>
