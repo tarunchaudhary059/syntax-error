@@ -1,2 +1,3 @@
 # syntax-error
-bs
+BS....
+
