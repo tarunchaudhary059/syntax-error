@@ -28,7 +28,7 @@ const lastGestureAt = new Map();
 const lastAimAt = new Map();
 const lastAttackAt = new Map();
 const DAMAGE = { fireball: 18, chidori: 25, rasenshuriken: 22, hollowPurple: 35, narutoRush: 20 };
-const MAX_HEALTH = 100;
+const MAX_HEALTH = 1000;
 
 app.get('/', (_req, res) => {
   const indexFile = fs.existsSync(path.join(__dirname, 'index.html'))
@@ -114,7 +114,13 @@ io.on('connection', socket => {
     lastAimAt.set(socket.id, now);
     const x = Number.isFinite(payload.x) ? Math.max(0, Math.min(1, payload.x)) : 0.5;
     const y = Number.isFinite(payload.y) ? Math.max(0, Math.min(1, payload.y)) : 0.5;
-    socket.to(code).emit('opponent-aim-position', { x, y, visible: true });
+    socket.to(code).emit('opponent-aim-position', { x, y, visible: true, charged: payload.charged === true });
+  });
+
+  socket.on('player-charged', payload => {
+    const code = socketRoom.get(socket.id);
+    if (!code || !rooms.has(code)) return;
+    socket.to(code).emit('opponent-charged', { charged: Boolean(payload?.charged) });
   });
 
   socket.on('head-position', payload => {
