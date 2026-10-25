@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shinobi Jutsu — Practice & Teach Mode</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,700&family=Reggae+One&family=RocknRoll+One&family=Shippori+Mincho:wght@600;800&family=Shojumaru&family=Yuji+Boku&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="ninja-theme.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+
+  <style>
+    :root {
+      --cyan: #00e5ff;
+      --orange: #ff6a00;
+      --gold: #f59e0b;
+      --red: #ff2a4b;
+    }
+
+    * { box-sizing: border-box; margin: 0; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #050811;
+      font-family: var(--font-combat), Arial, sans-serif;
+      color: #fff;
+      user-select: none;
+    }
+
+    /* ---------- Shinobi Frame: Japanese Dojo / Training Ground ---------- */
+    #shinobiFrame {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .frame-corner-bg {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      background: #090e18;
+      z-index: 1;
+    }
+
+    .frame-corner-bg--tl { top: 0; left: 0; }
+    .frame-corner-bg--tr { top: 0; right: 0; }
+    .frame-corner-bg--bl { bottom: 0; left: 0; }
+    .frame-corner-bg--br { bottom: 0; right: 0; }
+
+    .frame-edge {
+      position: absolute;
+      z-index: 2;
+      background-color: #0b1220;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
+    }
+
+    .frame-edge--horizontal { left: 0; width: 100%; height: 28px; }
+    .frame-edge--vertical { top: 0; height: 100%; width: 28px; }
+
+    .frame-edge--top {
+      top: 0;
+      background-image: linear-gradient(
+        to bottom,
+        #f59e0b 0 1px,
+        #0b1220 1px 11px,
+        #ff6a00 11px 17px,
+        #0b1220 17px 27px,
+        #f59e0b 27px 28px
+      );
+      clip-path: polygon(0 0, 100% 0, calc(100% - 28px) 100%, 28px 100%);
+    }
+
+    .frame-edge--bottom {
+      bottom: 0;
+      background-image: linear-gradient(
+        to top,
+        #f59e0b 0 1px,
+        #0b1220 1px 11px,
+        #ff6a00 11px 17px,
+        #0b1220 17px 27px,
+        #f59e0b 27px 28px
+      );
+      clip-path: polygon(28px 0, calc(100% - 28px) 0, 100% 100%, 0 100%);
+    }
+
+    .frame-edge--left {
+      left: 0;
+      background-image: linear-gradient(
+        to right,
+        #f59e0b 0 1px,
+        #0b1220 1px 11px,
+        #ff6a00 11px 17px,
+        #0b1220 17px 27px,
+        #f59e0b 27px 28px
+      );
+      clip-path: polygon(0 0, 100% 28px, 100% calc(100% - 28px), 0 100%);
+    }
+
+    .frame-edge--right {
+      right: 0;
+      background-image: linear-gradient(
+        to left,
+        #f59e0b 0 1px,
+        #0b1220 1px 11px,
+        #ff6a00 11px 17px,
+        #0b1220 17px 27px,
+        #f59e0b 27px 28px
+      );
+      clip-path: polygon(0 28px, 100% 0, 100% 100%, 0 calc(100% - 28px));
+    }
+
+    .frame-title {
+      position: absolute;
+      top: 1px;
+      left: 50%;
+      z-index: 4;
+      padding: 5px 24px 6px;
+      border: 1.5px solid #f59e0b;
+      border-top: 0;
+      border-radius: 0 0 8px 8px;
+      color: #ffe082;
+      background: linear-gradient(180deg, #1e293b 0%, #090e18 100%);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8), 0 0 14px rgba(245, 158, 11, 0.4);
+      font-family: var(--font-title);
+      font-size: clamp(14px, 1.8vw, 18px);
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(245, 158, 11, 0.7), 0 2px 4px rgba(0, 0, 0, 0.9);
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+
+    .back-btn {
+      position: fixed;
+      z-index: 50;
+      top: 10px;
+      right: 14px;
+      padding: 7px 14px;
+      color: #fff;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1.5px solid var(--orange);
+      border-radius: 8px;
+      text-decoration: none;
+      font-family: var(--font-combat);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      box-shadow: 0 0 12px rgba(255, 106, 0, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .back-btn:hover,
+    .back-btn:focus-visible {
+      background: rgba(230, 81, 0, 0.95);
+      border-color: #ff9100;
+      box-shadow: 0 0 20px rgba(255, 106, 0, 0.7);
+      outline: none;
+      transform: scale(1.03);
+    }
+
+    #v_src, #out {
+      position: absolute;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    #out {
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .darkness {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(5, 8, 17, 0.15) 0%, rgba(5, 8, 17, 0.6) 80%, rgba(5, 8, 17, 0.88) 100%);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* Red dotted rectangle covering player's face */
+    #facePointer {
+      position: absolute;
+      z-index: 99;
+      border: 2px dotted #ff2a4b;
+      border-radius: 6px;
+      background: rgba(255, 42, 75, 0.08);
+      box-shadow: 0 0 14px rgba(255, 42, 75, 0.5), inset 0 0 8px rgba(255, 42, 75, 0.2);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      display: none;
+      will-change: left, top, width, height;
+    }
+
+    #facePointer::after {
+      content: 'SHINOBI FACE';
+      position: absolute;
+      left: 50%;
+      top: -20px;
+      transform: translateX(-50%);
+      font-family: var(--font-combat);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: #ff6b81;
+      text-shadow: 0 1px 4px #000, 0 0 8px rgba(255, 42, 75, 0.8);
+      white-space: nowrap;
+    }
+
+    .fx {
+      position: absolute;
+      width: min(42vw, 520px);
+      height: auto;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      display: none;
+      mix-blend-mode: screen;
+      z-index: 20;
+      object-fit: contain;
+    }
+
+    #rasenFx {
+      width: min(175.5vw, 2160px);
+    }
+
+    /* ---------- TEACH MODE: Top Middle Interactive HUD ---------- */
+    .teach-mode-hud {
+      position: absolute;
+      z-index: 35;
+      top: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(720px, calc(100vw - 32px));
+      background: rgba(8, 14, 25, 0.94);
+      border: 1.5px solid var(--orange);
+      border-radius: 12px;
+      padding: 10px 16px 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.85), 0 0 18px rgba(255, 106, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(6px);
+    }
+
+    .teach-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .teach-title {
+      font-family: var(--font-title);
+      font-size: 14px;
+      letter-spacing: 2px;
+      color: #ffe082;
+      text-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .teach-title .kanji-mini {
+      background: var(--orange);
+      color: #000;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+
+    .attack-selector {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .teach-atk-btn {
+      padding: 5px 10px;
+      border: 1.5px solid rgba(255, 106, 0, 0.4);
+      background: #0f1929;
+      color: #e2e8f0;
+      border-radius: 6px;
+      font-family: var(--font-combat);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .teach-atk-btn:hover {
+      border-color: var(--orange);
+      background: #1b2d47;
+      color: #fff;
+    }
+
+    .teach-atk-btn.active {
+      border-color: var(--orange);
+      background: linear-gradient(180deg, #ff6a00 0%, #d95300 100%);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(255, 106, 0, 0.5);
+    }
+
+    .teach-atk-btn.free-mode.active {
+      border-color: var(--cyan);
+      background: linear-gradient(180deg, #00b4d8 0%, #0077b6 100%);
+      box-shadow: 0 0 12px rgba(0, 180, 216, 0.5);
+    }
+
+    .teach-close-btn {
+      background: #1e293b;
+      border: 1px solid rgba(255, 106, 0, 0.45);
+      border-radius: 6px;
+      color: #ffe082;
+      font-family: var(--font-combat);
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 10px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      margin-left: auto;
+    }
+
+    .teach-close-btn:hover {
+      background: var(--orange);
+      color: #fff;
+      border-color: #ff9100;
+      box-shadow: 0 0 10px rgba(255, 106, 0, 0.5);
+    }
+
+    .open-teach-badge {
+      position: absolute;
+      z-index: 35;
+      top: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 7px 16px;
+      background: rgba(8, 14, 25, 0.95);
+      border: 1.5px solid var(--orange);
+      border-radius: 999px;
+      color: #ffe082;
+      font-family: var(--font-combat);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), 0 0 14px rgba(255, 106, 0, 0.35);
+      transition: all 0.2s ease;
+      backdrop-filter: blur(6px);
+    }
+
+    .open-teach-badge:hover {
+      transform: translateX(-50%) scale(1.05);
+      background: linear-gradient(180deg, #1e293b 0%, #090e18 100%);
+      border-color: #ff9100;
+      box-shadow: 0 6px 25px rgba(255, 106, 0, 0.5);
+      color: #fff;
+    }
+
+    .teach-mode-hud.teach-hidden {
+      display: none !important;
+    }
+
+    /* Hand Signs Order Steps Display */
+    .teach-sign-steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      flex-wrap: wrap;
+      margin: 4px 0;
+    }
+
+    .teach-step-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1.5px solid #334155;
+      border-radius: 8px;
+      padding: 6px 12px;
+      transition: all 0.25s ease;
+      min-width: 140px;
+    }
+
+    .teach-step-card.active {
+      border-color: var(--orange);
+      background: rgba(45, 24, 10, 0.95);
+      box-shadow: 0 0 16px rgba(255, 106, 0, 0.5), inset 0 0 8px rgba(255, 106, 0, 0.25);
+      animation: teachCardPulse 1.2s infinite alternate ease-in-out;
+    }
+
+    @keyframes teachCardPulse {
+      0% { transform: scale(1); border-color: var(--orange); }
+      100% { transform: scale(1.04); border-color: #ff9100; box-shadow: 0 0 20px rgba(255, 145, 0, 0.7); }
+    }
+
+    .teach-step-card.completed {
+      border-color: #10b981;
+      background: rgba(6, 78, 59, 0.75);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.45);
+    }
+
+    .teach-step-badge {
+      font-size: 11px;
+      font-weight: 800;
+      color: #94a3b8;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .teach-step-card.active .teach-step-badge { color: #f59e0b; }
+    .teach-step-card.completed .teach-step-badge { color: #34d399; }
+
+    .teach-step-emoji {
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .teach-step-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .teach-step-name {
+      font-family: var(--font-ninja);
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .teach-step-desc {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 600;
+      line-height: 1.15;
+    }
+
+    .teach-arrow {
+      color: var(--orange);
+      font-size: 20px;
+      font-weight: 800;
+      opacity: 0.8;
+    }
+
+    .teach-guide-feedback {
+      font-family: var(--font-combat);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      color: var(--cyan);
+      text-shadow: 0 0 8px rgba(0, 229, 255, 0.6);
+      text-align: center;
+    }
+
+    /* ---------- Jutsu Scroll (Ancient Parchment Notebook) ---------- */
+    .moves {
+      position: absolute;
+      z-index: 30;
+      left: 36px;
+      top: 36px;
+      width: min(270px, calc(100vw - 72px));
+      background: var(--scroll-bg);
+      background-image:
+        radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.5), transparent 70%),
+        linear-gradient(180deg, #fbf5e8 0%, var(--scroll-bg-aged) 100%);
+      color: var(--scroll-ink);
+      border: 2px solid var(--scroll-border);
+      border-radius: 6px;
+      padding: 12px 14px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), 0 0 15px rgba(139, 90, 43, 0.3);
+      user-select: none;
+      transform-origin: top center;
+      transition: all 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+
+    /* Wooden Scroll Rods at Top and Bottom */
+    .moves::before,
+    .moves::after {
+      content: "";
+      position: absolute;
+      left: -8px;
+      right: -8px;
+      height: 12px;
+      background: linear-gradient(90deg, var(--scroll-wood-dark), var(--scroll-wood) 50%, var(--scroll-wood-dark));
+      border-radius: 6px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.6);
+      border: 1px solid #7c4118;
+    }
+
+    .moves::before { top: -6px; }
+    .moves::after { bottom: -6px; }
+
+    /* Scroll Notebook Open Animation */
+    .moves.scrolling-notebook {
+      animation: scrollNotebookOpen 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+    }
+
+    /* Scroll Notebook Closed State */
+    .moves.scroll-hidden {
+      max-height: 0 !important;
+      opacity: 0 !important;
+      transform: scaleY(0.05) translateY(-20px) !important;
+      clip-path: inset(0 0 100% 0) !important;
+      pointer-events: none !important;
+      overflow: hidden;
+    }
+
+    .moves-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      border-bottom: 1.5px solid rgba(42, 29, 18, 0.2);
+      padding-bottom: 4px;
+    }
+
+    .moves-head h3 {
+      margin: 0;
+      color: var(--scroll-ink);
+      font-size: 15px;
+      letter-spacing: 2px;
+      font-family: var(--font-ninja);
+      text-transform: uppercase;
+    }
+
+    .scroll-close-btn {
+      background: none;
+      border: 1px solid rgba(42, 29, 18, 0.4);
+      border-radius: 4px;
+      color: var(--scroll-ink);
+      font-family: var(--font-combat);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .scroll-close-btn:hover {
+      background: var(--orange);
+      color: #fff;
+      border-color: var(--orange);
+    }
+
+    .move {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      border-top: 1px solid rgba(42, 29, 18, 0.12);
+      padding: 5px 0;
+      font-size: 12px;
+    }
+
+    .move b {
+      color: var(--scroll-ink);
+      font-family: var(--font-ninja);
+      font-size: 12px;
+    }
+
+    .move span {
+      color: #854d0e;
+      text-align: right;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .sign-box {
+      margin-top: 10px;
+      padding: 8px 10px;
+      background: rgba(30, 41, 59, 0.94);
+      border: 1.5px solid var(--orange);
+      border-radius: 8px;
+      box-shadow: 0 0 14px rgba(255, 106, 0, 0.35);
+    }
+
+    .sign-box-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-combat);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--orange);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .sign-box-title:before {
+      content: '';
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: var(--orange);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--orange);
+      animation: signPulse 1.8s infinite ease-in-out;
+    }
+
+    @keyframes signPulse {
+      0%, 100% { opacity: .5; transform: scale(.9); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    #message {
+      font-family: var(--font-combat);
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.35;
+      letter-spacing: .6px;
+      color: #ffe082;
+      text-shadow: 0 0 8px rgba(255, 224, 130, 0.5);
+      word-break: break-word;
+    }
+
+    .sound-toggle-btn {
+      margin-top: 8px;
+      width: 100%;
+      padding: 6px 10px;
+      font-family: var(--font-combat);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-radius: 6px;
+      border: 1.5px solid var(--orange);
+      background: #1e293b;
+      color: #ffe082;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 106, 0, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .sound-toggle-btn:hover {
+      background: #334155;
+      border-color: #ff9100;
+      color: #fff;
+    }
+
+    .sound-toggle-btn.sound-off {
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    /* Floating Pill Button to Reopen Scroll */
+    .open-scroll-badge {
+      position: absolute;
+      z-index: 30;
+      left: 36px;
+      top: 36px;
+      padding: 8px 14px;
+      background: var(--scroll-bg);
+      border: 1.5px solid #8b5a2b;
+      border-radius: 8px;
+      color: var(--scroll-ink);
+      font-family: var(--font-ninja);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 106, 0, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .open-scroll-badge:hover {
+      transform: scale(1.05);
+      border-color: var(--orange);
+      background: #faf3e3;
+    }
+
+    @media (max-width: 768px) {
+      .teach-mode-hud {
+        width: calc(100vw - 20px);
+        top: 32px;
+        padding: 8px 10px;
+      }
+      .teach-step-card {
+        padding: 4px 8px;
+        min-width: 100px;
+      }
+      .teach-step-emoji { font-size: 18px; }
+      .teach-step-name { font-size: 12px; }
+      .moves {
+        left: 10px;
+        top: 170px;
+        width: min(220px, calc(100vw - 20px));
+        font-size: 10px;
+        padding: 8px 10px;
+      }
+      .open-scroll-badge {
+        left: 10px;
+        top: 170px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="shinobiFrame" aria-hidden="true">
+    <span class="frame-corner-bg frame-corner-bg--tl"></span>
+    <span class="frame-corner-bg frame-corner-bg--tr"></span>
+    <span class="frame-corner-bg frame-corner-bg--bl"></span>
+    <span class="frame-corner-bg frame-corner-bg--br"></span>
+    <span class="frame-edge frame-edge--horizontal frame-edge--top"></span>
+    <span class="frame-edge frame-edge--horizontal frame-edge--bottom"></span>
+    <span class="frame-edge frame-edge--vertical frame-edge--left"></span>
+    <span class="frame-edge frame-edge--vertical frame-edge--right"></span>
+    <span class="frame-title">修練場 • Training Grounds</span>
+  </div>
+
+  <a href="index.html" class="back-btn">← Main menu</a>
+  <video id="v_src" autoplay playsinline muted></video>
+  <canvas id="out"></canvas>
+  <div class="darkness"></div>
+  <div id="facePointer" aria-hidden="true"></div>
+
+  <!-- Video Animations -->
+  <video id="rasenFx" class="fx" src="assets/naruto.mp4" muted playsinline></video>
+  <video id="chidoriFx" class="fx" src="assets/sasuke.mp4" muted playsinline></video>
+  <video id="fireballFx" class="fx" src="assets/fireball_justsu.mp4" muted playsinline></video>
+  <video id="hollowPurpleFx" class="fx" src="assets/Hollow%20purple.mp4" muted playsinline></video>
+
+  <!-- Reopen Teach Mode Pill Badge -->
+  <button id="openTeachBadge" class="open-teach-badge" type="button" style="display:none;">🎓 Show Teach Mode</button>
+
+  <!-- TEACH MODE: Top Middle Interactive HUD -->
+  <div id="teachModeContainer" class="teach-mode-hud">
+    <div class="teach-header">
+      <span class="teach-title"><span class="kanji-mini">伝承</span> TEACH MODE</span>
+      <div class="attack-selector">
+        <button class="teach-atk-btn active" data-jutsu="Fireball Jutsu" type="button">🔥 Fireball</button>
+        <button class="teach-atk-btn" data-jutsu="Chidori" type="button">⚡ Chidori</button>
+        <button class="teach-atk-btn" data-jutsu="Rasenshuriken" type="button">🌀 Rasenshuriken</button>
+        <button class="teach-atk-btn" data-jutsu="Hollow Purple" type="button">🟣 Hollow Purple</button>
+        <button class="teach-atk-btn free-mode" data-jutsu="Free" type="button">⚔️ Free Practice</button>
+      </div>
+      <button id="hideTeachBtn" class="teach-close-btn" type="button" title="Hide Teaching Mode">Hide ✕</button>
+    </div>
+    <div id="teachSignSteps" class="teach-sign-steps"></div>
+    <div id="teachGuideFeedback" class="teach-guide-feedback">Form Sign 1 to begin</div>
+  </div>
+
+  <!-- Reopen Jutsu Scroll Pill Badge -->
+  <button id="openScrollBadge" class="open-scroll-badge" type="button" style="display:none;">📜 Open Jutsu Scroll</button>
+
+  <!-- Jutsu Scroll (Ancient Parchment Notebook) -->
+  <div class="moves scrolling-notebook" id="status">
+    <div class="moves-head">
+      <h3>📜 JUTSU SCROLL</h3>
+      <button id="toggleScrollBtn" class="scroll-close-btn" type="button" title="Hide Scroll">Hide ✕</button>
+    </div>
+    <div class="move"><b>Fireball</b><span>👌🏼 Horse › 👉🏼 Rat › 🤙🏼 Tiger<br>18 DMG</span></div>
+    <div class="move"><b>Chidori</b><span>✊🏼 Fist › ☝🏼 Dog › ✋🏼 Open<br>25 DMG</span></div>
+    <div class="move"><b>Rasenshuriken</b><span>✌🏼 Peace › ✊🏼 Fist › ✋🏼 Open<br>22 DMG</span></div>
+    <div class="move"><b>Hollow Purple</b><span>🤘🏼 Horns › ✊🏼 Fist › ✌🏼 Peace<br>35 DMG</span></div>
+    <div class="sign-box">
+      <div class="sign-box-title">CURRENT HAND SIGN</div>
+      <div id="message">Show one hand to the camera.</div>
+    </div>
+    <button id="enableMp4Audio" class="sound-toggle-btn sound-off" type="button">Sound: OFF 🔇</button>
+  </div>
+
+<script>
+const video = document.getElementById("v_src");
+const canvas = document.getElementById("out");
+const ctx = canvas.getContext("2d");
+
+const rasenFx = document.getElementById("rasenFx");
+const chidoriFx = document.getElementById("chidoriFx");
+const fireballFx = document.getElementById("fireballFx");
+const hollowPurpleFx = document.getElementById("hollowPurpleFx");
+const message = document.getElementById("message");
+const facePointer = document.getElementById("facePointer");
+const enableMp4AudioButton = document.getElementById("enableMp4Audio");
+const scrollStatus = document.getElementById("status");
+const toggleScrollBtn = document.getElementById("toggleScrollBtn");
+const openScrollBadge = document.getElementById("openScrollBadge");
+
+let mp4AudioEnabled = false;
+
+/* =====================================================
+   Scroll Notebook Toggle (Smooth Roll-up / Unroll)
+   ===================================================== */
+function hideScroll() {
+  scrollStatus.classList.remove("scrolling-notebook");
+  scrollStatus.classList.add("scroll-hidden");
+  openScrollBadge.style.display = "block";
+}
+
+function showScroll() {
+  openScrollBadge.style.display = "none";
+  scrollStatus.classList.remove("scroll-hidden");
+  void scrollStatus.offsetWidth; // trigger reflow for smooth notebook animation
+  scrollStatus.classList.add("scrolling-notebook");
+}
+
+toggleScrollBtn.addEventListener("click", hideScroll);
+openScrollBadge.addEventListener("click", showScroll);
+
+/* =====================================================
+   Teach Mode Hide / Show Toggle
+   ===================================================== */
+const hideTeachBtn = document.getElementById("hideTeachBtn");
+const openTeachBadge = document.getElementById("openTeachBadge");
+const teachContainer = document.getElementById("teachModeContainer");
+
+if(hideTeachBtn && openTeachBadge && teachContainer){
+  hideTeachBtn.addEventListener("click", () => {
+    teachContainer.classList.add("teach-hidden");
+    openTeachBadge.style.display = "block";
+  });
+  openTeachBadge.addEventListener("click", () => {
+    openTeachBadge.style.display = "none";
+    teachContainer.classList.remove("teach-hidden");
+  });
+}
+
+/* =====================================================
+   Teach Mode Configuration & Data
+   ===================================================== */
+const SIGN_DETAILS = {
+  peace:       { name: "Peace",       emoji: "✌🏼", desc: "Index & middle fingers" },
+  fist:        { name: "Fist",        emoji: "✊🏼", desc: "All fingers closed" },
+  open:        { name: "Open Palm",   emoji: "✋🏼", desc: "All fingers extended" },
+  dog:         { name: "Dog",         emoji: "☝🏼", desc: "Index finger extended" },
+  horse:       { name: "Horse",       emoji: "👌🏼", desc: "Middle, ring & pinky" },
+  rat:         { name: "Rat",         emoji: "👉🏼", desc: "Index finger & thumb" },
+  tiger:       { name: "Tiger",       emoji: "🤙🏼", desc: "Pinky finger extended" },
+  purpleStart: { name: "Index+Pinky", emoji: "🤘🏼", desc: "Index & pinky extended" }
+};
+
+const JUTSU_RECIPES = {
+  "Fireball Jutsu": [
+    { sign: "horse", label: "Step 1" },
+    { sign: "rat",   label: "Step 2" },
+    { sign: "tiger", label: "Step 3" }
+  ],
+  "Chidori": [
+    { sign: "fist", label: "Step 1" },
+    { sign: "dog",  label: "Step 2" },
+    { sign: "open", label: "Step 3" }
+  ],
+  "Rasenshuriken": [
+    { sign: "peace", label: "Step 1" },
+    { sign: "fist",  label: "Step 2" },
+    { sign: "open",  label: "Step 3" }
+  ],
+  "Hollow Purple": [
+    { sign: "purpleStart", label: "Step 1" },
+    { sign: "fist",        label: "Step 2" },
+    { sign: "peace",       label: "Step 3" }
+  ]
+};
+
+let currentTeachJutsu = "Fireball Jutsu";
+let teachCurrentStep = 0; // 0, 1, 2
+
+function renderTeachSteps() {
+  const container = document.getElementById("teachSignSteps");
+  const feedback = document.getElementById("teachGuideFeedback");
+
+  if (currentTeachJutsu === "Free") {
+    container.innerHTML = `
+      <div style="font-family: var(--font-ninja); color: #70f5ff; font-size: 14px; padding: 6px 0;">
+        ⚡ Free Shinobi Practice — Form any valid 3-sign sequence to unleash jutsu!
+      </div>`;
+    feedback.textContent = "Start with Horse, Fist, Peace, or Horns";
+    return;
+  }
+
+  const recipe = JUTSU_RECIPES[currentTeachJutsu];
+  if (!recipe) return;
+
+  let html = "";
+  recipe.forEach((step, idx) => {
+    const s = SIGN_DETAILS[step.sign];
+    let statusClass = "upcoming";
+    let iconPrefix = "";
+    if (idx < teachCurrentStep) {
+      statusClass = "completed";
+      iconPrefix = "✓ ";
+    } else if (idx === teachCurrentStep) {
+      statusClass = "active";
+    }
+
+    html += `
+      <div class="teach-step-card ${statusClass}" id="teachStep-${idx}">
+        <span class="teach-step-emoji">${s.emoji}</span>
+        <div class="teach-step-info">
+          <span class="teach-step-badge">${iconPrefix}${step.label}</span>
+          <span class="teach-step-name">${s.name}</span>
+          <span class="teach-step-desc">${s.desc}</span>
+        </div>
+      </div>
+    `;
+
+    if (idx < recipe.length - 1) {
+      html += `<span class="teach-arrow">›</span>`;
+    }
+  });
+
+  container.innerHTML = html;
+
+  // Guidance feedback
+  const currSign = recipe[teachCurrentStep];
+  if (currSign) {
+    const s = SIGN_DETAILS[currSign.sign];
+    feedback.innerHTML = `Step ${teachCurrentStep + 1} of 3: Form <b>${s.name}</b> (${s.emoji} — ${s.desc})`;
+  } else {
+    feedback.innerHTML = `✨ <b>TECHNIQUE UNLEASHED!</b> Form Step 1 to practice again.`;
+  }
+}
+
+// Wire attack selector buttons
+document.querySelectorAll(".teach-atk-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".teach-atk-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentTeachJutsu = btn.dataset.jutsu;
+    teachCurrentStep = 0;
+    renderTeachSteps();
+  });
+});
+
+renderTeachSteps();
+
+/* =====================================================
+   Audio Management (practicebgmusic.mp3 & Jutsu FX)
+   ===================================================== */
+const attackEffects = {
+  Rasenshuriken: rasenFx,
+  Chidori: chidoriFx,
+  "Fireball Jutsu": fireballFx,
+  "Hollow Purple": hollowPurpleFx
+};
+
+const practiceBgAudio = new Audio("practicebgmusic.mp3");
+practiceBgAudio.loop = true;
+practiceBgAudio.volume = 0.55;
+
+function startPracticeBgMusic(){
+  if (practiceBgAudio.paused) {
+    practiceBgAudio.play().then(() => {
+      mp4AudioEnabled = true;
+      Object.values(attackEffects).forEach(fx => { fx.muted = false; });
+      updatePracticeAudioButton();
+    }).catch(() => {});
+  }
+}
+
+function unlockPracticeAudio(){
+  startPracticeBgMusic();
+  if(window.AudioContext || window.webkitAudioContext){
+    try{
+      if(!window.__audioContext) window.__audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      if(window.__audioContext.state === 'suspended') window.__audioContext.resume();
+    }catch(e){}
+  }
+}
+window.addEventListener('click', unlockPracticeAudio, { passive: true });
+window.addEventListener('keydown', unlockPracticeAudio, { passive: true });
+window.addEventListener('touchstart', unlockPracticeAudio, { passive: true });
+
+// Play when practice mode opens
+startPracticeBgMusic();
+
+function updatePracticeAudioButton(){
+  enableMp4AudioButton.textContent = mp4AudioEnabled ? "Sound: ON 🔊" : "Sound: OFF 🔇";
+  enableMp4AudioButton.classList.toggle("sound-off", !mp4AudioEnabled);
+}
+
+enableMp4AudioButton.addEventListener("click", () => {
+  unlockPracticeAudio();
+  mp4AudioEnabled = !mp4AudioEnabled;
+  if (mp4AudioEnabled) {
+    practiceBgAudio.play().catch(() => {});
+  } else {
+    practiceBgAudio.pause();
+  }
+  Object.values(attackEffects).forEach(fx => {
+    fx.muted = !mp4AudioEnabled;
+  });
+  updatePracticeAudioButton();
+  message.textContent = mp4AudioEnabled ? "Sound enabled. Perform an attack sequence." : "Sound muted.";
+});
+
+const HOLD_MS = 280;
+const SEQUENCE_TIMEOUT_MS = 3800;
+
+const states = {
+  Left: createState(),
+  Right: createState()
+};
+
+Object.entries(attackEffects).forEach(([attackName, fx]) => {
+  fx.addEventListener("ended", () => {
+    for (const state of Object.values(states)) {
+      if (state.attack === attackName) {
+        state.attack = null;
+      }
+    }
+    fx.style.display = "none";
+  });
+});
+
+function createState() {
+  return {
+    next: 0,
+    type: null,
+    lastSign: null,
+    signSince: 0,
+    lastAcceptedSign: null,
+    lastAcceptedAt: 0,
+    lastSeen: 0,
+    attack: null
+  };
+}
+
+function distance(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function extendedFingers(p) {
+  const wrist = p[0];
+  return [
+    distance(p[8], wrist) > distance(p[6], wrist) * 1.12,
+    distance(p[12], wrist) > distance(p[10], wrist) * 1.12,
+    distance(p[16], wrist) > distance(p[14], wrist) * 1.12,
+    distance(p[20], wrist) > distance(p[18], wrist) * 1.12
+  ];
+}
+
+function thumbExtended(p) {
+  return distance(p[4], p[5]) > distance(p[3], p[5]) * 1.08;
+}
+
+function classifyGesture(p) {
+  const f = extendedFingers(p);
+  const thumb = thumbExtended(p);
+  const count = f.filter(Boolean).length;
+
+  if (count === 4 && thumb) return "open";
+  if (count === 0 && !thumb) return "fist";
+  if (f[0] && !f[1] && !f[2] && f[3]) return "purpleStart";
+  if (!f[0] && f[1] && f[2] && f[3]) return "horse";
+  if (f[0] && !f[1] && !f[2] && !f[3] && thumb) return "rat";
+  if (!f[0] && !f[1] && !f[2] && f[3]) return "tiger";
+  if (f[0] && f[1] && !f[2] && !f[3]) return "peace";
+  if (f[0] && !f[1] && !f[2] && !f[3] && !thumb) return "dog";
+  return "other";
+}
+
+function resetSequence(state) {
+  state.next = 0;
+  state.type = null;
+  state.lastAcceptedSign = null;
+  state.lastAcceptedAt = 0;
+}
+
+function hideEffects() {
+  Object.values(attackEffects).forEach(fx => {
+    fx.style.display = "none";
+  });
+}
+
+function positionEffect(fx, p) {
+  if (fx === chidoriFx) {
+    const xs = p.map(point => point.x);
+    const ys = p.map(point => point.y);
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+    const aspectRatio = fx.videoWidth && fx.videoHeight ? fx.videoWidth / fx.videoHeight : 16 / 9;
+    const handWidth = (maxX - minX) * window.innerWidth;
+    const handHeight = (maxY - minY) * window.innerHeight;
+    fx.style.width = `${Math.max(handWidth, handHeight * aspectRatio) * 8}px`;
+    fx.style.left = `${(1 - centerX) * window.innerWidth}px`;
+    fx.style.top = `${centerY * window.innerHeight}px`;
+    return;
+  }
+
+  const wrist = p[0], middleMcp = p[9], middleTip = p[12];
+  const palmX = (wrist.x + middleMcp.x) / 2;
+  const palmY = (wrist.y + middleMcp.y) / 2;
+
+  if (fx === fireballFx) {
+    const xs = p.map(point => point.x);
+    const ys = p.map(point => point.y);
+    const handWidth = (Math.max(...xs) - Math.min(...xs)) * window.innerWidth;
+    const handHeight = (Math.max(...ys) - Math.min(...ys)) * window.innerHeight;
+    const fingertipX = (p[8].x + p[12].x + p[16].x + p[20].x) / 4;
+    const fingertipY = (p[8].y + p[12].y + p[16].y + p[20].y) / 4;
+    const aspectRatio = fx.videoWidth && fx.videoHeight ? fx.videoWidth / fx.videoHeight : 16 / 9;
+    fx.style.width = `${Math.max(handWidth, handHeight * aspectRatio) * 2}px`;
+    fx.style.left = `${(1 - fingertipX) * window.innerWidth}px`;
+    fx.style.top = `${fingertipY * window.innerHeight}px`;
+    return;
+  }
+
+  if (fx === hollowPurpleFx) {
+    const xs = p.map(point => point.x);
+    const ys = p.map(point => point.y);
+    const handWidth = (Math.max(...xs) - Math.min(...xs)) * window.innerWidth;
+    const handHeight = (Math.max(...ys) - Math.min(...ys)) * window.innerHeight;
+    const aspectRatio = fx.videoWidth && fx.videoHeight ? fx.videoWidth / fx.videoHeight : 16 / 9;
+    const effectWidth = Math.max(handWidth, handHeight * aspectRatio) * 0.36;
+    const indexTip = p[8], indexMcp = p[5];
+    const directionX = (indexMcp.x - indexTip.x) * window.innerWidth;
+    const directionY = (indexTip.y - indexMcp.y) * window.innerHeight;
+    const directionLength = Math.hypot(directionX, directionY) || 1;
+    const offset = effectWidth * 0.4;
+    const centerX = (1 - indexTip.x) * window.innerWidth + (directionX / directionLength) * offset;
+    const centerY = indexTip.y * window.innerHeight + (directionY / directionLength) * offset;
+    fx.style.width = `${effectWidth}px`;
+    fx.style.left = `${centerX}px`;
+    fx.style.top = `${centerY}px`;
+    return;
+  }
+
+  const fingerOffset = fx === rasenFx ? 1.15 : 0.12;
+  const offsetX = (middleTip.x - middleMcp.x) * fingerOffset;
+  const offsetY = (middleTip.y - middleMcp.y) * fingerOffset;
+  const x = (1 - (palmX + offsetX)) * window.innerWidth;
+  const y = (palmY + offsetY) * window.innerHeight;
+
+  fx.style.left = `${x}px`;
+  fx.style.top = `${y}px`;
+}
+
+function startAttack(state, name, p, handLabel) {
+  state.attack = name;
+  resetSequence(state);
+
+  const fx = attackEffects[name];
+  Object.values(attackEffects)
+    .filter(effect => effect !== fx)
+    .forEach(effect => { effect.style.display = "none"; });
+
+  fx.currentTime = 0;
+  fx.style.display = "block";
+  fx.style.opacity = "1";
+  positionEffect(fx, p);
+
+  fx.play().catch(error => {
+    state.attack = null;
+    fx.style.display = "none";
+    message.textContent = mp4AudioEnabled
+      ? `Could not play ${name} animation. Check video.`
+      : `Could not play ${name}. Enable audio and retry.`;
+    console.error(error);
+  });
+
+  message.textContent = `⚡ ${name} ACTIVATED with ${handLabel.toLowerCase()} hand!`;
+
+  if (currentTeachJutsu !== "Free") {
+    teachCurrentStep = 3;
+    renderTeachSteps();
+    setTimeout(() => {
+      teachCurrentStep = 0;
+      renderTeachSteps();
+    }, 3200);
+  }
+}
+
+function processGesture(state, sign, p, handLabel, now) {
+  if (state.attack) {
+    const fx = attackEffects[state.attack];
+    if (!fx) return;
+    positionEffect(fx, p);
+    fx.style.display = "block";
+    return;
+  }
+
+  if (state.next > 0 && now - state.lastAcceptedAt > SEQUENCE_TIMEOUT_MS) {
+    resetSequence(state);
+    message.textContent = "Sequence timed out. Try again.";
+    if (currentTeachJutsu !== "Free") {
+      teachCurrentStep = 0;
+      renderTeachSteps();
+    }
+  }
+
+  if (sign !== state.lastSign) {
+    state.lastSign = sign;
+    state.signSince = now;
+  }
+
+  if (sign === "other" || now - state.signSince < HOLD_MS) {
+    return;
+  }
+
+  if (sign === state.lastAcceptedSign) {
+    return;
+  }
+
+  // Update current sign badge
+  const signObj = SIGN_DETAILS[sign];
+  if (signObj) {
+    message.innerHTML = `Detected: <b>${signObj.emoji} ${signObj.name}</b> (${signObj.desc})`;
+  }
+
+  // In Teach Mode for a specific jutsu:
+  if (currentTeachJutsu !== "Free") {
+    const recipe = JUTSU_RECIPES[currentTeachJutsu];
+    if (recipe && recipe[teachCurrentStep]) {
+      const expectedSign = recipe[teachCurrentStep].sign;
+      if (sign === expectedSign) {
+        state.lastAcceptedSign = sign;
+        state.lastAcceptedAt = now;
+        teachCurrentStep++;
+        renderTeachSteps();
+
+        if (teachCurrentStep === 3) {
+          startAttack(state, currentTeachJutsu, p, handLabel);
+        }
+        return;
+      }
+    }
+  }
+
+  // General free training flow
+  let expected = null;
+  if (state.next === 0) {
+    if (sign === "peace") { state.type = "Rasenshuriken"; expected = "peace"; }
+    else if (sign === "fist") { state.type = "Chidori"; expected = "fist"; }
+    else if (sign === "horse") { state.type = "Fireball Jutsu"; expected = "horse"; }
+    else if (sign === "purpleStart") { state.type = "Hollow Purple"; expected = "purpleStart"; }
+  } else if (state.next === 1) {
+    if (state.type === "Rasenshuriken" && sign === "fist") expected = "fist";
+    else if (state.type === "Chidori" && sign === "dog") expected = "dog";
+    else if (state.type === "Fireball Jutsu" && sign === "rat") expected = "rat";
+    else if (state.type === "Hollow Purple" && sign === "fist") expected = "fist";
+  } else if (state.next === 2) {
+    if (state.type === "Fireball Jutsu" && sign === "tiger") expected = "tiger";
+    else if ((state.type === "Rasenshuriken" || state.type === "Chidori") && sign === "open") expected = "open";
+    else if (state.type === "Hollow Purple" && sign === "peace") expected = "peace";
+  }
+
+  if (!expected) {
+    if (sign === "peace" || sign === "fist" || sign === "horse" || sign === "purpleStart") {
+      state.next = 0;
+      state.type = sign === "peace" ? "Rasenshuriken"
+        : sign === "fist" ? "Chidori"
+        : sign === "horse" ? "Fireball Jutsu" : "Hollow Purple";
+      state.next = 1;
+      state.lastAcceptedSign = sign;
+      state.lastAcceptedAt = now;
+      message.textContent = `${state.type}: 1st sign detected (${SIGN_DETAILS[sign].name})`;
+    }
+    return;
+  }
+
+  state.lastAcceptedSign = sign;
+  state.lastAcceptedAt = now;
+
+  if (state.next === 0) {
+    state.next = 1;
+    message.textContent = `${state.type}: 1st sign detected (${SIGN_DETAILS[sign].name})`;
+  } else if (state.next === 1) {
+    state.next = 2;
+    message.textContent = `⚡ ${state.type}: CHARGED! Ready for final sign.`;
+  } else if (state.next === 2) {
+    startAttack(state, state.type, p, handLabel);
+  }
+}
+
+function onResults(results) {
+  if (!video.videoWidth || !video.videoHeight) return;
+
+  if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+  }
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const now = performance.now();
+  const seen = new Set();
+
+  if (results.multiHandLandmarks && results.multiHandedness) {
+    results.multiHandLandmarks.forEach((p, i) => {
+      const label = results.multiHandedness[i].label;
+      const state = states[label] || states.Right;
+      seen.add(label);
+      state.lastSeen = now;
+
+      ctx.save();
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = "#ff6a00";
+
+      drawConnectors(ctx, p, HAND_CONNECTIONS, {
+        color: "#ff8800",
+        lineWidth: 3
+      });
+
+      drawLandmarks(ctx, p, {
+        color: "#00e5ff",
+        lineWidth: 1,
+        radius: 3
+      });
+
+      ctx.restore();
+
+      const sign = classifyGesture(p);
+      processGesture(state, sign, p, label, now);
+    });
+  }
+
+  for (const label of ["Left", "Right"]) {
+    const state = states[label];
+    if (!seen.has(label) && now - state.lastSeen > 500) {
+      state.lastSign = null;
+      state.signSince = 0;
+      state.lastAcceptedSign = null;
+      if (!state.attack) resetSequence(state);
+    }
+  }
+
+  const active = ["Left", "Right"].some(label => Boolean(states[label].attack));
+  if (!active) {
+    hideEffects();
+  }
+}
+
+/* =====================================================
+   High-Precision Face Target Boundary (Smallest Enclosing Rectangle)
+   ===================================================== */
+let lastFaceSeenAt = 0;
+let faceSmoother = { x: 0.5, y: 0.5, w: 0.2, h: 0.28 };
+
+function updateFacePointer(targetX, targetY, targetW, targetH) {
+  lastFaceSeenAt = performance.now();
+  const k = 0.85;
+  faceSmoother.x += (targetX - faceSmoother.x) * k;
+  faceSmoother.y += (targetY - faceSmoother.y) * k;
+  faceSmoother.w += (targetW - faceSmoother.w) * k;
+  faceSmoother.h += (targetH - faceSmoother.h) * k;
+
+  const left = faceSmoother.x * window.innerWidth;
+  const top = faceSmoother.y * window.innerHeight;
+  const width = faceSmoother.w * window.innerWidth;
+  const height = faceSmoother.h * window.innerHeight;
+
+  facePointer.style.left = `${left + width / 2}px`;
+  facePointer.style.top = `${top + height / 2}px`;
+  facePointer.style.width = `${width}px`;
+  facePointer.style.height = `${height}px`;
+  facePointer.style.display = "block";
+}
+
+// WebSocket bridge to Python High-Precision Face Service
+let pyWs = null, lastPySend = 0, pyCanvas = null, pyCtx = null;
+function tryConnectPythonService() {
+  if (pyWs) return;
+  try {
+    const ws = new WebSocket("ws://localhost:8765");
+    pyWs = ws;
+    ws.onmessage = e => {
+      try {
+        const d = JSON.parse(e.data);
+        if (d && d.detected && d.box) {
+          const b = d.box;
+          // Video is mirrored via scaleX(-1) in CSS
+          const targetX = 1 - (b.x + b.w);
+          const targetY = b.y;
+          const targetW = b.w;
+          const targetH = b.h;
+          updateFacePointer(targetX, targetY, targetW, targetH);
+        }
+      } catch (err) {}
+    };
+    ws.onerror = () => { pyWs = null; };
+    ws.onclose = () => { pyWs = null; };
+  } catch (e) {
+    pyWs = null;
+  }
+}
+tryConnectPythonService();
+
+function sendFrameToPythonIfConnected() {
+  if (!pyWs || pyWs.readyState !== WebSocket.OPEN) {
+    tryConnectPythonService();
+    return false;
+  }
+  if (performance.now() - lastPySend < 50) return true;
+  if (!video.videoWidth) return false;
+  lastPySend = performance.now();
+
+  if (!pyCanvas) {
+    pyCanvas = document.createElement("canvas");
+    pyCanvas.width = 320;
+    pyCanvas.height = 240;
+    pyCtx = pyCanvas.getContext("2d");
+  }
+  pyCtx.drawImage(video, 0, 0, 320, 240);
+  pyWs.send(pyCanvas.toDataURL("image/jpeg", 0.5));
+  return true;
+}
+
+function onFaceResults(results) {
+  // If Python microservice is providing 478-point bounding boxes, prefer it
+  if (pyWs && pyWs.readyState === WebSocket.OPEN && performance.now() - lastFaceSeenAt < 300) {
+    return;
+  }
+
+  const detection = results.detections && results.detections[0];
+  const location = detection && detection.locationData;
+  const box = location && location.relativeBoundingBox;
+
+  if (!box) {
+    if (performance.now() - lastFaceSeenAt > 1200) {
+      facePointer.style.display = "none";
+    }
+    return;
+  }
+
+  const rawX = box.xmin !== undefined ? box.xmin : (box.xMin !== undefined ? box.xMin : undefined);
+  const rawY = box.ymin !== undefined ? box.ymin : (box.yMin !== undefined ? box.yMin : undefined);
+  const rawW = box.width !== undefined ? box.width : (box.w !== undefined ? box.w : undefined);
+  const rawH = box.height !== undefined ? box.height : (box.h !== undefined ? box.h : undefined);
+
+  if (rawX === undefined || rawY === undefined || rawW === undefined || rawH === undefined) return;
+
+  const bx = Number(rawX), by = Number(rawY), bw = Number(rawW), bh = Number(rawH);
+  if (!Number.isFinite(bx) || !Number.isFinite(by) || !Number.isFinite(bw) || !Number.isFinite(bh)) return;
+
+  // Smallest rectangle strictly enclosing the face
+  const targetX = 1 - (bx + bw);
+  const targetY = by;
+  const targetW = bw;
+  const targetH = bh;
+
+  updateFacePointer(targetX, targetY, targetW, targetH);
+}
+
+const hands = new Hands({
+  locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+});
+
+hands.setOptions({
+  maxNumHands: 2,
+  modelComplexity: 1,
+  minDetectionConfidence: 0.65,
+  minTrackingConfidence: 0.65
+});
+hands.onResults(onResults);
+
+const faceDetection = new FaceDetection({
+  locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`
+});
+faceDetection.setOptions({ model: "short", minDetectionConfidence: 0.5 });
+faceDetection.onResults(onFaceResults);
+
+let lastFaceDetectionAt = 0;
+let faceDetectionFailed = false;
+
+const camera = new Camera(video, {
+  onFrame: async () => {
+    await hands.send({ image: video });
+    sendFrameToPythonIfConnected();
+    const now = performance.now();
+    if (!faceDetectionFailed && now - lastFaceDetectionAt >= 150) {
+      lastFaceDetectionAt = now;
+      try {
+        await faceDetection.send({ image: video });
+      } catch (error) {
+        faceDetectionFailed = true;
+        facePointer.style.display = "none";
+      }
+    }
+  },
+  width: 1280,
+  height: 720
+});
+
+camera.start().catch(error => {
+  message.textContent = "Could not start camera. Check permissions.";
+  console.error(error);
+});
+</script>
+</body>
+</html>
