@@ -427,7 +427,19 @@ button:disabled{opacity:.5;cursor:default}
 #opponentCrosshair:before,#opponentCrosshair:after{content:'';position:absolute;background:#38bdf8;left:50%;top:50%;transform:translate(-50%,-50%)}
 #opponentCrosshair:before{width:36px;height:2px}
 #opponentCrosshair:after{width:2px;height:36px}
-#opponentCrosshair.glow{border-color:#00ffff;box-shadow:0 0 18px #00ffff,0 0 32px #00a8ff}
+#opponentCrosshair.glow{
+  border-color:#ff9100;
+  box-shadow:0 0 18px #ff6a00,0 0 32px #ff9100,0 0 45px rgba(255,106,0,0.85);
+  animation:opponentOrangeGlowPulse .45s infinite alternate;
+}
+#opponentCrosshair.glow:before,#opponentCrosshair.glow:after{
+  background:#ff9100;
+  box-shadow:0 0 10px #ff6a00;
+}
+@keyframes opponentOrangeGlowPulse{
+  0%{transform:translate(-50%,-50%) scale(1.05);filter:brightness(1.2)}
+  100%{transform:translate(-50%,-50%) scale(1.35);filter:brightness(1.6)}
+}
 
 /* Red Dotted Facial Rectangle Boundary (High-Precision) */
 #headTarget{
@@ -686,6 +698,10 @@ const crosshair = $('crosshair'), opponentCrosshair = $('opponentCrosshair'), he
 const logBox = $('battleLog');
 let localStream = null, pc = null, roomCode = '', playerNumber = 0, peerReady = false;
 let soundEnabled = true;
+const battleBgAudio = new Audio('battlebgmusic.mp3');
+battleBgAudio.loop = true;
+battleBgAudio.volume = 0.5;
+
 function unlockAudio(){
  if(!soundEnabled) return;
  if(window.AudioContext || window.webkitAudioContext){
@@ -695,9 +711,30 @@ function unlockAudio(){
   }catch(e){}
  }
 }
-window.addEventListener('click', unlockAudio, { passive: true });
-window.addEventListener('keydown', unlockAudio, { passive: true });
-window.addEventListener('touchstart', unlockAudio, { passive: true });
+
+function startBattleBgMusic(){
+ if(!soundEnabled) return;
+ unlockAudio();
+ if(battleBgAudio.paused){
+  battleBgAudio.play().catch(()=>{});
+ }
+}
+
+function pauseBattleBgMusic(){
+ battleBgAudio.pause();
+}
+
+window.addEventListener('click', startBattleBgMusic, { passive: true });
+window.addEventListener('keydown', startBattleBgMusic, { passive: true });
+window.addEventListener('touchstart', startBattleBgMusic, { passive: true });
+
+document.addEventListener('visibilitychange', () => {
+ if(document.hidden){
+  battleBgAudio.pause();
+ } else if(soundEnabled){
+  battleBgAudio.play().catch(()=>{});
+ }
+});
 
 function updateSoundButtons(){
  if($('setupSoundBtn')){
@@ -710,8 +747,12 @@ function updateSoundButtons(){
  }
 }
 function toggleSound(){
- unlockAudio();
  soundEnabled = !soundEnabled;
+ if(soundEnabled){
+  startBattleBgMusic();
+ } else {
+  pauseBattleBgMusic();
+ }
  updateSoundButtons();
  document.querySelectorAll('.fx').forEach(v => { v.muted = !soundEnabled; });
 }
@@ -896,10 +937,12 @@ if($('forfeitBtn')){
   const inActiveMatch = arena.classList.contains('show') && peerReady && !gameOver;
   if(inActiveMatch){
    if(confirm('Are you sure you want to forfeit? Your rival will be declared the winner.')){
+    pauseBattleBgMusic();
     if(socket) socket.emit('forfeit');
     setTimeout(() => { location.href = 'index.html'; }, 150);
    }
   } else {
+   pauseBattleBgMusic();
    location.href = 'index.html';
   }
  };
@@ -1114,6 +1157,7 @@ else{
   updateScoreUI(d?.currentRound || 1, d?.totalRounds || matchTotalRounds, d?.scores || {});
   setPlayerCombatMsg('Ready');
   setRivalCombatMsg('Ready');
+  startBattleBgMusic();
   log('Rematch begins. May the sharper shinobi prevail.');
  });
 }
@@ -1139,7 +1183,7 @@ function positionOpponentCrosshair(){
  opponentCrosshair.style.display = 'block';
 }
 remoteVideo.addEventListener('loadedmetadata',()=>{positionOpponentCrosshair();updateHeadTarget()});
-function showArena(){setup.style.display='none';arena.classList.add('show');startTracking();}
+function showArena(){setup.style.display='none';arena.classList.add('show');startBattleBgMusic();startTracking();}
 async function setupPeerConnection(){
  if(pc)return;
  pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]});
