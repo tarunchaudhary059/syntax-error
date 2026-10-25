@@ -30,7 +30,7 @@ const lastAttackAt = new Map();
 const lastTypeAttackAt = new Map();
 const DAMAGE = { fireball: 18, chidori: 25, rasenshuriken: 22, hollowPurple: 35, narutoRush: 20 };
 const COOLDOWNS = { fireball: 5000, rasenshuriken: 6500, chidori: 7500, hollowPurple: 10000, narutoRush: 6000 };
-const MAX_HEALTH = 1000;
+const MAX_HEALTH = 250;
 
 app.get('/', (_req, res) => {
   const indexFile = fs.existsSync(path.join(__dirname, 'index.html'))
@@ -52,7 +52,17 @@ function snapshot(code) {
   if (!room) return;
   const health = {};
   for (const id of room.players) health[id] = room.health.get(id) ?? MAX_HEALTH;
-  io.to(code).emit('battle-state', { health, maxHealth: MAX_HEALTH, over: room.over });
+  const scores = {};
+  for (const id of room.players) scores[id] = (room.scores && room.scores.get(id)) ?? 0;
+  io.to(code).emit('battle-state', {
+    health,
+    maxHealth: MAX_HEALTH,
+    scores,
+    currentRound: room.currentRound || 1,
+    totalRounds: room.totalRounds || 3,
+    roundOver: Boolean(room.roundOver),
+    over: room.over
+  });
 }
 function leaveRoom(socket) {
   const code = socketRoom.get(socket.id);
@@ -61,7 +71,24 @@ function leaveRoom(socket) {
   if (room) {
     room.players.delete(socket.id);
     room.health.delete(socket.id);
-    socket.to(code).emit('room-error', { message: 'Your opponent disconnected. Create or join a room again.' });
+    if (room.scores) room.scores.delete(socket.id);
+    if (room.roundTimer) clearTimeout(room.roundTimer);
+
+    // If battle was live and opponent is still connected, declare them winner
+    if (!room.over && room.players.size > 0) {
+      room.over = true;
+      const winnerId = [...room.players][0];
+      io.to(code).emit('battle-over', {
+        winner: winnerId,
+        loser: socket.id,
+        reason: 'disconnect',
+        scores: Object.fromEntries(room.scores || []),
+        totalRounds: room.totalRounds || 3
+      });
+    } else {
+      socket.to(code).emit('room-error', { message: 'Your opponent left the room.' });
+    }
+
     if (room.players.size === 0) rooms.delete(code);
     else snapshot(code);
   }
@@ -75,21 +102,33 @@ function joinExisting(socket, code) {
   if (room.players.size >= 2) return socket.emit('room-error', { message: 'That room already has two players.' });
   room.players.add(socket.id);
   room.health.set(socket.id, MAX_HEALTH);
+  if (!room.scores) room.scores = new Map();
+  room.scores.set(socket.id, 0);
   socketRoom.set(socket.id, code);
   socket.join(code);
-  socket.emit('room-joined', { roomCode: code, playerNumber: room.players.size });
+  socket.emit('room-joined', { roomCode: code, playerNumber: room.players.size, totalRounds: room.totalRounds || 3, maxHealth: MAX_HEALTH });
   socket.to(code).emit('player-joined', { playerNumber: 2 });
   if (room.players.size === 2) snapshot(code);
 }
 
 io.on('connection', socket => {
-  socket.on('create-room', () => {
+  socket.on('create-room', payload => {
     leaveRoom(socket);
     const code = makeCode();
-    rooms.set(code, { players: new Set([socket.id]), health: new Map([[socket.id, MAX_HEALTH]]), over: false });
+    const totalRounds = Math.max(1, Math.min(15, parseInt(payload?.totalRounds) || 3));
+    rooms.set(code, {
+      players: new Set([socket.id]),
+      health: new Map([[socket.id, MAX_HEALTH]]),
+      scores: new Map([[socket.id, 0]]),
+      totalRounds,
+      currentRound: 1,
+      roundOver: false,
+      over: false,
+      roundTimer: null
+    });
     socketRoom.set(socket.id, code);
     socket.join(code);
-    socket.emit('room-created', { roomCode: code, maxHealth: MAX_HEALTH });
+    socket.emit('room-created', { roomCode: code, maxHealth: MAX_HEALTH, totalRounds });
   });
   socket.on('join-room', payload => {
     const code = String(payload?.roomCode || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
@@ -172,27 +211,95 @@ io.on('connection', socket => {
     if (payload.hit === true) {
       const targetId = [...room.players].find(id => id !== socket.id);
       if (!targetId) return;
+      if (room.roundOver || room.over) return;
       const health = Math.max(0, (room.health.get(targetId) ?? MAX_HEALTH) - DAMAGE[type]);
       room.health.set(targetId, health);
-      if (health === 0) room.over = true;
       io.to(code).emit('battle-log', { attacker: socket.id, target: targetId, type, damage: DAMAGE[type], hit: true, health, x, y });
       snapshot(code);
-      if (room.over) io.to(code).emit('battle-over', { winner: socket.id, loser: targetId });
+      if (health === 0) {
+        room.roundOver = true;
+        const currentWinnerScore = ((room.scores && room.scores.get(socket.id)) || 0) + 1;
+        if (room.scores) room.scores.set(socket.id, currentWinnerScore);
+        const scoresObj = Object.fromEntries(room.scores || new Map());
+        const neededWins = Math.ceil(room.totalRounds / 2);
+
+        if (currentWinnerScore >= neededWins || room.currentRound >= room.totalRounds) {
+          room.over = true;
+          io.to(code).emit('battle-over', {
+            winner: socket.id,
+            loser: targetId,
+            reason: 'knockout',
+            scores: scoresObj,
+            totalRounds: room.totalRounds
+          });
+        } else {
+          io.to(code).emit('round-over', {
+            roundWinner: socket.id,
+            scores: scoresObj,
+            currentRound: room.currentRound,
+            totalRounds: room.totalRounds,
+            waitSeconds: 5
+          });
+
+          room.roundTimer = setTimeout(() => {
+            if (!rooms.has(code) || room.over) return;
+            room.currentRound++;
+            room.roundOver = false;
+            for (const id of room.players) {
+              room.health.set(id, MAX_HEALTH);
+              for (const k of lastTypeAttackAt.keys()) {
+                if (k.startsWith(id + '_')) lastTypeAttackAt.delete(k);
+              }
+            }
+            io.to(code).emit('round-started', {
+              currentRound: room.currentRound,
+              totalRounds: room.totalRounds,
+              scores: Object.fromEntries(room.scores || new Map()),
+              maxHealth: MAX_HEALTH
+            });
+            snapshot(code);
+          }, 5000);
+        }
+      }
     } else {
       socket.emit('battle-log', { attacker: socket.id, type, hit: false, x, y });
     }
   });
+  socket.on('forfeit', () => {
+    const code = socketRoom.get(socket.id);
+    const room = rooms.get(code);
+    if (!room || room.over || !room.players.has(socket.id)) return;
+    room.over = true;
+    if (room.roundTimer) clearTimeout(room.roundTimer);
+    const rivalId = [...room.players].find(id => id !== socket.id);
+    io.to(code).emit('battle-over', {
+      winner: rivalId,
+      loser: socket.id,
+      reason: 'forfeit',
+      scores: Object.fromEntries(room.scores || new Map()),
+      totalRounds: room.totalRounds || 3
+    });
+  });
   socket.on('rematch', () => {
     const code = socketRoom.get(socket.id), room = rooms.get(code);
     if (!room || room.players.size !== 2) return;
+    if (room.roundTimer) clearTimeout(room.roundTimer);
     room.over = false;
+    room.roundOver = false;
+    room.currentRound = 1;
     for (const id of room.players) {
       room.health.set(id, MAX_HEALTH);
+      if (room.scores) room.scores.set(id, 0);
       for (const k of lastTypeAttackAt.keys()) {
         if (k.startsWith(id + '_')) lastTypeAttackAt.delete(k);
       }
     }
-    io.to(code).emit('rematch-started');
+    io.to(code).emit('rematch-started', {
+      currentRound: 1,
+      totalRounds: room.totalRounds || 3,
+      scores: Object.fromEntries(room.scores || new Map()),
+      maxHealth: MAX_HEALTH
+    });
     snapshot(code);
   });
   socket.on('disconnect', () => {
