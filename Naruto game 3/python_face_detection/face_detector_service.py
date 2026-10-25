@@ -130,19 +130,65 @@ def detect_face_skin(image_bgr):
     return best_box
 
 
+class FaceBoxSmoother:
+    """
+    Exponential Moving Average (EMA) filter to provide jitter-free,
+    rock-solid face tracking boundary across consecutive video frames.
+    """
+    def __init__(self, alpha=0.75):
+        self.alpha = alpha
+        self.box = None
+        self.lost_frames = 0
+
+    def update(self, raw_box):
+        if raw_box is None:
+            self.lost_frames += 1
+            if self.lost_frames > 8:
+                self.box = None
+            return self.box
+
+        self.lost_frames = 0
+        if self.box is None:
+            self.box = dict(raw_box)
+        else:
+            a = self.alpha
+            self.box["x"] = a * raw_box["x"] + (1 - a) * self.box["x"]
+            self.box["y"] = a * raw_box["y"] + (1 - a) * self.box["y"]
+            self.box["w"] = a * raw_box["w"] + (1 - a) * self.box["w"]
+            self.box["h"] = a * raw_box["h"] + (1 - a) * self.box["h"]
+            self.box["engine"] = raw_box.get("engine", "mediapipe_face_mesh")
+            self.box["point_count"] = raw_box.get("point_count", 468)
+
+        return {
+            "x": round(float(self.box["x"]), 5),
+            "y": round(float(self.box["y"]), 5),
+            "w": round(float(self.box["w"]), 5),
+            "h": round(float(self.box["h"]), 5),
+            "engine": self.box.get("engine", "mediapipe_face_mesh"),
+            "point_count": self.box.get("point_count", 468)
+        }
+
+    def reset(self):
+        self.box = None
+        self.lost_frames = 0
+
+
+client_smoothers = {}
+
+
 def detect_face(image_bgr):
     """
-    Detects face in BGR image using MediaPipe Face Mesh.
-    Captures all 468 facial points (jawline, cheeks, eyes, nose, forehead, chin)
-    and computes the tight rectangular boundary enclosing all detected points.
-    Returns normalized dict: {'x': x_min, 'y': y_min, 'w': width, 'h': height} in range [0, 1]
+    High-precision face detection.
+    Extracts all 468 3D landmarks from MediaPipe FaceMesh to snugly
+    encapsulate the chin, jawline, cheeks, nose, eyes, and forehead hairline.
+    Returns normalized bounding box dict: {'x': x, 'y': y, 'w': w, 'h': h}
     or None if no face is detected.
     """
     h, w, _ = image_bgr.shape
     if h == 0 or w == 0:
         return None
 
-    # 1. Primary: MediaPipe Face Mesh (extracts all 468 facial points)
+    # 1. Primary: MediaPipe Face Mesh (extracts all 468 facial points with anatomical precision)
     if MEDIAPIPE_MESH_AVAILABLE and mp_face_mesh_detector is not None:
         image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
         results = mp_face_mesh_detector.process(image_rgb)
@@ -152,18 +198,27 @@ def detect_face(image_bgr):
             all_y = [pt.y for pt in landmarks]
             min_x, max_x = min(all_x), max(all_x)
             min_y, max_y = min(all_y), max(all_y)
-            pad_x = (max_x - min_x) * 0.04
-            pad_y = (max_y - min_y) * 0.04
-            box_x = float(max(0.0, min_x - pad_x))
-            box_y = float(max(0.0, min_y - pad_y))
-            box_w = float(min(1.0 - box_x, (max_x - min_x) + pad_x * 2))
-            box_h = float(min(1.0 - box_y, (max_y - min_y) + pad_y * 2))
+            span_x = max_x - min_x
+            span_y = max_y - min_y
+
+            # Anatomical head calibration:
+            # FaceMesh landmark 10 sits at upper forehead; human skull/hairline continues ~8% upward.
+            # Landmark 152 defines the chin base. Landmarks 234/454 define the cheek boundaries.
+            pad_top = span_y * 0.09
+            pad_bottom = span_y * 0.03
+            pad_side = span_x * 0.045
+
+            box_x = float(max(0.0, min_x - pad_side))
+            box_y = float(max(0.0, min_y - pad_top))
+            box_w = float(min(1.0 - box_x, span_x + pad_side * 2))
+            box_h = float(min(1.0 - box_y, span_y + pad_top + pad_bottom))
+
             return {
                 "x": box_x,
                 "y": box_y,
                 "w": box_w,
                 "h": box_h,
-                "engine": "mediapipe_face_mesh",
+                "engine": "mediapipe_face_mesh_hd",
                 "point_count": len(landmarks)
             }
         return None
@@ -175,11 +230,16 @@ def detect_face(image_bgr):
         if results.detections:
             first_face = results.detections[0]
             box = first_face.location_data.relative_bounding_box
+            # Slightly expand box to encompass full hair/forehead
+            bx = float(max(0.0, min(1.0, box.xmin - box.width * 0.03)))
+            by = float(max(0.0, min(1.0, box.ymin - box.height * 0.06)))
+            bw = float(min(1.0 - bx, box.width * 1.06))
+            bh = float(min(1.0 - by, box.height * 1.08))
             return {
-                "x": float(max(0.0, min(1.0, box.xmin))),
-                "y": float(max(0.0, min(1.0, box.ymin))),
-                "w": float(max(0.0, min(1.0, box.width))),
-                "h": float(max(0.0, min(1.0, box.height))),
+                "x": bx,
+                "y": by,
+                "w": bw,
+                "h": bh,
                 "engine": "mediapipe_blazeface"
             }
         return None
@@ -191,10 +251,10 @@ def detect_face(image_bgr):
         if len(faces) > 0:
             x, y, fw, fh = faces[0]
             return {
-                "x": float(x / w),
-                "y": float(y / h),
-                "w": float(fw / w),
-                "h": float(fh / h),
+                "x": float(max(0.0, (x - fw * 0.03) / w)),
+                "y": float(max(0.0, (y - fh * 0.06) / h)),
+                "w": float(min(1.0, (fw * 1.06) / w)),
+                "h": float(min(1.0, (fh * 1.08) / h)),
                 "engine": "opencv_cascade"
             }
 
@@ -204,6 +264,7 @@ def detect_face(image_bgr):
 
 async def handler(websocket):
     print(f"🔗 Browser client connected: {websocket.remote_address}")
+    smoother = FaceBoxSmoother(alpha=0.80)
     try:
         async for message in websocket:
             try:
@@ -221,9 +282,10 @@ async def handler(websocket):
                     await websocket.send(json.dumps({"detected": False}))
                     continue
 
-                box = detect_face(frame)
-                if box:
-                    response = {"detected": True, "box": box}
+                raw_box = detect_face(frame)
+                smoothed_box = smoother.update(raw_box)
+                if smoothed_box:
+                    response = {"detected": True, "box": smoothed_box}
                 else:
                     response = {"detected": False}
 

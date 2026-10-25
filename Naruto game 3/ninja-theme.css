@@ -1,0 +1,229 @@
+@charset "UTF-8";
+/* ==========================================================================
+   SHINOBI JUTSU - NARUTO-INSPIRED ANIME DESIGN SYSTEM
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,700&family=Reggae+One&family=RocknRoll+One&family=Shippori+Mincho:wght@600;800&family=Shojumaru&family=Yuji+Boku&display=swap');
+
+:root {
+  /* Naruto World Color Palette */
+  --color-leaf-orange: #ff6a00;
+  --color-leaf-orange-deep: #e65100;
+  --color-leaf-orange-glow: rgba(255, 106, 0, 0.45);
+  --color-chakra-blue: #00e5ff;
+  --color-chakra-blue-glow: rgba(0, 229, 255, 0.45);
+  --color-rasengan-blue: #38bdf8;
+  --color-sharingan-red: #ff2a4b;
+  --color-sharingan-glow: rgba(255, 42, 75, 0.45);
+  --color-hollow-purple: #a855f7;
+  --color-gold: #f59e0b;
+  --color-gold-glow: rgba(245, 158, 11, 0.4);
+
+  /* Scroll & Parchment Material */
+  --scroll-bg: #f5eedc;
+  --scroll-bg-aged: #e8dcb8;
+  --scroll-ink: #1e1308;
+  --scroll-wood: #4d260c;
+  --scroll-wood-dark: #2c1404;
+  --scroll-border: #8b5a2b;
+  --scroll-seal-red: #b91c1c;
+
+  /* Atmospheric Shinobi Arena */
+  --bg-dusk: #060911;
+  --bg-dusk-card: rgba(8, 14, 25, 0.94);
+  --bg-dusk-overlay: rgba(3, 7, 15, 0.85);
+  --border-shinobi: rgba(255, 106, 0, 0.4);
+  --border-chakra: rgba(0, 229, 255, 0.45);
+
+  /* Global Typography System */
+  --font-title: 'Shojumaru', 'Reggae One', 'Shippori Mincho', serif;
+  --font-ninja: 'Reggae One', 'RocknRoll One', 'Shojumaru', sans-serif;
+  --font-calligraphy: 'Yuji Boku', 'Shippori Mincho', serif;
+  --font-combat: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --font-body: 'Barlow Condensed', Arial, sans-serif;
+}
+
+/* ---------- Keyframes: Chakra Energy, Pulses, and Flames ---------- */
+@keyframes chakraPulseOrange {
+  0%, 100% {
+    box-shadow: 0 0 12px var(--color-leaf-orange-glow), 0 0 24px rgba(255, 106, 0, 0.2);
+    border-color: var(--color-leaf-orange);
+  }
+  50% {
+    box-shadow: 0 0 24px var(--color-leaf-orange-glow), 0 0 45px rgba(255, 106, 0, 0.35);
+    border-color: #ff9100;
+  }
+}
+
+@keyframes chakraPulseBlue {
+  0%, 100% {
+    box-shadow: 0 0 12px var(--color-chakra-blue-glow), 0 0 24px rgba(0, 229, 255, 0.2);
+    border-color: var(--color-chakra-blue);
+  }
+  50% {
+    box-shadow: 0 0 26px var(--color-chakra-blue-glow), 0 0 50px rgba(0, 229, 255, 0.4);
+    border-color: #67e8f9;
+  }
+}
+
+@keyframes sharinganPulse {
+  0%, 100% {
+    box-shadow: 0 0 12px var(--color-sharingan-glow), 0 0 22px rgba(255, 42, 75, 0.25);
+    border-color: var(--color-sharingan-red);
+  }
+  50% {
+    box-shadow: 0 0 24px var(--color-sharingan-glow), 0 0 42px rgba(255, 42, 75, 0.5);
+    border-color: #ff5277;
+  }
+}
+
+@keyframes flameFloat {
+  0% { transform: translateY(0) scale(1); opacity: 0.8; }
+  50% { transform: translateY(-12px) scale(1.08); opacity: 1; }
+  100% { transform: translateY(-24px) scale(0.9); opacity: 0; }
+}
+
+@keyframes scrollNotebookOpen {
+  0% {
+    max-height: 0;
+    opacity: 0;
+    transform: scaleY(0.1) translateY(-20px);
+    clip-path: inset(0 0 100% 0);
+  }
+  60% {
+    opacity: 0.9;
+  }
+  100% {
+    max-height: 750px;
+    opacity: 1;
+    transform: scaleY(1) translateY(0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* ---------- Ninja Scroll Material Component ---------- */
+.ninja-parchment-scroll {
+  position: relative;
+  background: var(--scroll-bg);
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.35), transparent 70%),
+    linear-gradient(180deg, #f7f0e0 0%, #e8dcbf 100%);
+  color: var(--scroll-ink);
+  border: 2px solid var(--scroll-border);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.65), 0 2px 8px rgba(77, 38, 12, 0.25);
+  border-radius: 4px;
+}
+
+/* Wooden roller rod at top and bottom */
+.ninja-parchment-scroll::before,
+.ninja-parchment-scroll::after {
+  content: "";
+  position: absolute;
+  left: -8px;
+  right: -8px;
+  height: 12px;
+  background: linear-gradient(90deg, #2c1404, var(--scroll-wood) 20%, #7d441c 50%, var(--scroll-wood) 80%, #2c1404);
+  border-radius: 6px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
+  z-index: 2;
+}
+
+.ninja-parchment-scroll::before { top: -6px; }
+.ninja-parchment-scroll::after { bottom: -6px; }
+
+/* Crimson Ninja Seal Stamp */
+.ninja-seal-stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--scroll-seal-red);
+  color: var(--scroll-seal-red);
+  font-family: var(--font-title);
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: inset 0 0 4px rgba(185, 28, 28, 0.3);
+  transform: rotate(-8deg);
+}
+
+/* ---------- Ninja Scroll Button ---------- */
+.ninja-scroll-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 2.2rem;
+  background: var(--scroll-bg);
+  background-image: linear-gradient(180deg, #faf3e3 0%, var(--scroll-bg-aged) 100%);
+  color: var(--scroll-ink);
+  border: 1.5px solid var(--scroll-border);
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: var(--font-ninja);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.18s;
+  user-select: none;
+}
+
+/* Wooden rollers at ends */
+.ninja-scroll-btn::before,
+.ninja-scroll-btn::after {
+  content: "";
+  position: absolute;
+  top: -6px;
+  bottom: -6px;
+  width: 14px;
+  background: linear-gradient(90deg, var(--scroll-wood-dark), var(--scroll-wood) 50%, var(--scroll-wood-dark));
+  border-radius: 7px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.ninja-scroll-btn::before { left: -5px; }
+.ninja-scroll-btn::after { right: -5px; }
+
+.ninja-scroll-btn:hover,
+.ninja-scroll-btn:focus-visible {
+  transform: translateX(-8px) scale(1.02);
+  border-color: var(--color-leaf-orange);
+  box-shadow: 0 12px 32px var(--color-leaf-orange-glow), 0 0 0 2px var(--color-leaf-orange);
+  outline: none;
+}
+
+.ninja-scroll-btn:active {
+  transform: translateX(-4px) scale(0.99);
+}
+
+/* ---------- Shinobi Headband Metal Plate Motif ---------- */
+.headband-plate {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 16px;
+  background: linear-gradient(180deg, #d4d4d8 0%, #a1a1aa 50%, #71717a 100%);
+  color: #18181b;
+  border-radius: 4px;
+  border: 1px solid #e4e4e7;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.6), inset 0 1px 1px #fff;
+  font-family: var(--font-title);
+  letter-spacing: 2px;
+}
+
+.headband-plate::before,
+.headband-plate::after {
+  content: "•";
+  position: absolute;
+  font-size: 10px;
+  color: #3f3f46;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+.headband-plate::before { left: 4px; }
+.headband-plate::after { right: 4px; }
+
